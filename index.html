@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELN Express Limited | Fashion Delivery Experts</title>
+    <script>
+      // Protect window.fetch from being overwritten by polyfills
+      (function() {
+        try {
+          const originalFetch = window.fetch;
+          if (originalFetch) {
+            // Define a property with both getter and setter to prevent "only a getter" errors
+            Object.defineProperty(window, 'fetch', {
+              get: function() { return originalFetch; },
+              set: function(v) { 
+                console.warn('ELN: Attempted to overwrite fetch, blocked to prevent TypeError.');
+              },
+              configurable: true,
+              enumerable: true
+            });
+          }
+        } catch (e) {
+          console.warn('ELN: Could not protect fetch.', e);
+        }
+      })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .bg-eln-blue {
+        background-color: #034287;
+      }
+      .text-eln-blue {
+        color: #034287;
+      }
+      .border-eln-blue {
+        border-color: #034287;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              eln: {
+                DEFAULT: '#034287',
+                light: '#0456B0',
+                dark: '#022E5E'
+              }
+            },
+            borderRadius: {
+              '4xl': '2rem',
+              '5xl': '3rem',
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="/index.css">
+  </head>
+  <body class="bg-gray-50 text-gray-900 overflow-x-hidden">
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

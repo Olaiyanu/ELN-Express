@@ -1,0 +1,7 @@
+{
+  "name": "ELN Express Limited",
+  "description": "A professional logistics platform designed for fashion brands and small-scale businesses, featuring role-based dashboards for admins, merchants, and riders.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
