@@ -263,6 +263,42 @@ export const mockDb = {
       user.verificationStatus = status;
       if (reason) user.rejectionReason = reason;
       mockDb.saveUser(user);
+
+      // Notify User
+      mockDb.addNotification({
+        id: Math.random().toString(36).substring(2, 11),
+        userId: uid,
+        title: status === VerificationStatus.VERIFIED ? 'Account Verified' : 'Verification Update',
+        message: status === VerificationStatus.VERIFIED 
+          ? 'Congratulations! Your rider account has been verified. You can now start accepting jobs.' 
+          : `Your verification was ${status}.${reason ? ` Reason: ${reason}` : ''}`,
+        type: 'system',
+        read: false,
+        createdAt: Date.now()
+      });
+    }
+  },
+
+  submitVerification: (uid: string, data: { idCardUrl: string, selfieUrl: string, plateNumber: string }) => {
+    const users = mockDb.getUsers();
+    const user = users.find(u => u.uid === uid);
+    if (user) {
+      user.verificationStatus = VerificationStatus.PENDING;
+      user.idCardUrl = data.idCardUrl;
+      user.selfieUrl = data.selfieUrl;
+      user.plateNumber = data.plateNumber;
+      mockDb.saveUser(user);
+
+      // Notify Admin
+      mockDb.addNotification({
+        id: Math.random().toString(36).substring(2, 11),
+        userId: 'admin-1',
+        title: 'New Rider Verification',
+        message: `${user.name} has submitted documents for verification.`,
+        type: 'system',
+        read: false,
+        createdAt: Date.now()
+      });
     }
   },
   

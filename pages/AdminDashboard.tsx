@@ -378,15 +378,19 @@ const AdminControls = () => {
   const [activeTab, setActiveTab] = useState<'verifications' | 'merchants' | 'riders'>('verifications');
   const [users, setUsers] = useState<User[]>(mockDb.getUsers());
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [showRejectModal, setShowRejectModal] = useState<User | null>(null);
 
   const pendingVerifications = users.filter(u => u.verificationStatus === VerificationStatus.PENDING);
   const merchants = users.filter(u => u.role === UserRole.MERCHANT);
   const riders = users.filter(u => u.role === UserRole.RIDER);
 
-  const handleAction = (uid: string, status: VerificationStatus) => {
-    mockDb.updateVerificationStatus(uid, status);
+  const handleAction = (uid: string, status: VerificationStatus, reason?: string) => {
+    mockDb.updateVerificationStatus(uid, status, reason);
     setUsers(mockDb.getUsers());
     setSelectedUser(null);
+    setShowRejectModal(null);
+    setRejectionReason('');
   };
 
   const handleDelete = (uid: string) => {
@@ -431,11 +435,17 @@ const AdminControls = () => {
             <div>
               <h4 className="font-black text-gray-900 text-lg">{u.businessName || u.name}</h4>
               <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{u.role} • {u.phone || 'No Phone'}</p>
+              {u.verificationStatus === VerificationStatus.REJECTED && (
+                <p className="text-[10px] text-red-500 font-bold mt-2">Rejected: {u.rejectionReason}</p>
+              )}
             </div>
             {activeTab === 'verifications' ? (
-              <div className="flex space-x-3">
-                <button onClick={() => handleAction(u.uid, VerificationStatus.VERIFIED)} className="flex-1 py-3 bg-eln text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-eln/20">Approve</button>
-                <button onClick={() => handleAction(u.uid, VerificationStatus.REJECTED)} className="px-4 py-3 bg-red-50 text-red-500 rounded-xl font-black text-[10px] uppercase tracking-widest">Reject</button>
+              <div className="space-y-3">
+                <button onClick={() => setSelectedUser(u)} className="w-full py-3 bg-gray-50 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-eln hover:text-white transition-all">Review Documents</button>
+                <div className="flex space-x-3">
+                  <button onClick={() => handleAction(u.uid, VerificationStatus.VERIFIED)} className="flex-1 py-3 bg-eln text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-eln/20">Approve</button>
+                  <button onClick={() => setShowRejectModal(u)} className="px-4 py-3 bg-red-50 text-red-500 rounded-xl font-black text-[10px] uppercase tracking-widest">Reject</button>
+                </div>
               </div>
             ) : (
               <button onClick={() => setSelectedUser(u)} className="w-full py-3 bg-gray-50 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-eln hover:text-white transition-all">View Details</button>
@@ -444,30 +454,126 @@ const AdminControls = () => {
         ))}
       </div>
 
+      {/* User Details Modal */}
       {selectedUser && (
         <div className="fixed inset-0 bg-eln/60 backdrop-blur-md z-[70] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[3rem] p-10 w-full max-w-lg shadow-2xl space-y-8 animate-in zoom-in duration-300">
+          <div className="bg-white rounded-[3rem] p-10 w-full max-w-2xl shadow-2xl space-y-8 animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-black text-gray-900">User Profile</h3>
+              <h3 className="text-2xl font-black text-gray-900">User Verification</h3>
               <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400">
                 <X className="h-6 w-6" />
               </button>
             </div>
-            <div className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-3xl space-y-4">
-                <div className="flex justify-between border-b border-gray-200 pb-2">
-                  <span className="text-[10px] font-black uppercase text-gray-400">Full Name</span>
-                  <span className="text-sm font-bold">{selectedUser.name}</span>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div className="bg-gray-50 p-6 rounded-3xl space-y-4">
+                  <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Basic Information</h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between border-b border-gray-200 pb-2">
+                      <span className="text-[10px] font-black uppercase text-gray-400">Full Name</span>
+                      <span className="text-sm font-bold">{selectedUser.name}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-gray-200 pb-2">
+                      <span className="text-[10px] font-black uppercase text-gray-400">Email</span>
+                      <span className="text-sm font-bold">{selectedUser.email}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-gray-200 pb-2">
+                      <span className="text-[10px] font-black uppercase text-gray-400">Role</span>
+                      <span className="text-sm font-bold uppercase">{selectedUser.role}</span>
+                    </div>
+                    {selectedUser.plateNumber && (
+                      <div className="flex justify-between border-b border-gray-200 pb-2">
+                        <span className="text-[10px] font-black uppercase text-gray-400">Plate Number</span>
+                        <span className="text-sm font-bold text-eln">{selectedUser.plateNumber}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex justify-between border-b border-gray-200 pb-2">
-                  <span className="text-[10px] font-black uppercase text-gray-400">Email</span>
-                  <span className="text-sm font-bold">{selectedUser.email}</span>
-                </div>
-                <div className="flex justify-between border-b border-gray-200 pb-2">
-                  <span className="text-[10px] font-black uppercase text-gray-400">Status</span>
-                  <span className="text-sm font-bold text-eln">{selectedUser.verificationStatus}</span>
+
+                {selectedUser.verificationStatus === VerificationStatus.PENDING && (
+                  <div className="flex space-x-3">
+                    <button 
+                      onClick={() => handleAction(selectedUser.uid, VerificationStatus.VERIFIED)}
+                      className="flex-1 py-4 bg-eln text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-eln/20"
+                    >
+                      Approve Rider
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowRejectModal(selectedUser);
+                        setSelectedUser(null);
+                      }}
+                      className="px-6 py-4 bg-red-50 text-red-500 rounded-2xl font-black text-xs uppercase tracking-widest"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-6">
+                <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Verification Documents</h4>
+                <div className="grid grid-cols-1 gap-4">
+                  {selectedUser.idCardUrl ? (
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-black uppercase text-gray-400">Government ID</p>
+                      <div className="aspect-video rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
+                        <img src={selectedUser.idCardUrl} alt="ID Card" className="w-full h-full object-cover" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">
+                      <p className="text-xs text-gray-400 font-bold">No ID Uploaded</p>
+                    </div>
+                  )}
+
+                  {selectedUser.selfieUrl ? (
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-black uppercase text-gray-400">Selfie Verification</p>
+                      <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 max-w-[200px] mx-auto">
+                        <img src={selectedUser.selfieUrl} alt="Selfie" className="w-full h-full object-cover" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">
+                      <p className="text-xs text-gray-400 font-bold">No Selfie Uploaded</p>
+                    </div>
+                  )}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rejection Modal */}
+      {showRejectModal && (
+        <div className="fixed inset-0 bg-eln/60 backdrop-blur-md z-[80] flex items-center justify-center p-4">
+          <div className="bg-white rounded-[3rem] p-10 w-full max-w-md shadow-2xl space-y-8 animate-in zoom-in duration-300">
+            <div className="flex justify-between items-center">
+              <h3 className="text-2xl font-black text-gray-900">Reject Verification</h3>
+              <button onClick={() => setShowRejectModal(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400">
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Reason for Rejection</label>
+                <textarea 
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder="e.g. ID card is blurry or expired..."
+                  className="w-full p-4 bg-gray-50 border-none rounded-2xl font-bold text-sm h-32 resize-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+              <button 
+                onClick={() => handleAction(showRejectModal.uid, VerificationStatus.REJECTED, rejectionReason)}
+                disabled={!rejectionReason.trim()}
+                className="w-full py-5 bg-red-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-red-600/20 disabled:opacity-50"
+              >
+                Confirm Rejection
+              </button>
             </div>
           </div>
         </div>

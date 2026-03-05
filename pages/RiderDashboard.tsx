@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Bike, 
   LogOut, 
@@ -46,6 +47,7 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
   const [localUser, setLocalUser] = useState<UserType>(user);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const navigate = useNavigate();
 
   const refreshNotifications = () => {
     const data = mockDb.getNotifications(user.uid);
@@ -105,8 +107,53 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
   };
 
   const handleAccept = (orderId: string) => {
+    if (localUser.verificationStatus !== VerificationStatus.VERIFIED) {
+      alert('Your account must be verified before you can accept delivery missions.');
+      return;
+    }
     mockDb.updateOrderStatus(orderId, OrderStatus.IN_TRANSIT, user.uid, user.name);
     fetchOrders();
+  };
+
+  const VerificationBanner = () => {
+    if (localUser.verificationStatus === VerificationStatus.VERIFIED) return null;
+
+    return (
+      <div className="mb-8 animate-in slide-in-from-top duration-500">
+        {localUser.verificationStatus === VerificationStatus.PENDING ? (
+          <div className="bg-eln/5 border border-eln/10 p-6 rounded-[2rem] flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="h-12 w-12 bg-eln/10 rounded-2xl flex items-center justify-center text-eln">
+                <RefreshCw className="h-6 w-6 animate-spin-slow" />
+              </div>
+              <div>
+                <h4 className="font-black text-gray-900 text-sm">Verification in Progress</h4>
+                <p className="text-xs text-gray-500 font-medium">Our team is reviewing your documents. This usually takes less than 24 hours.</p>
+              </div>
+            </div>
+            <span className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-eln bg-white px-4 py-2 rounded-xl border border-eln/10">Pending Review</span>
+          </div>
+        ) : localUser.verificationStatus === VerificationStatus.REJECTED ? (
+          <div className="bg-red-50 border border-red-100 p-6 rounded-[2rem] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center space-x-4">
+              <div className="h-12 w-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600">
+                <Ban className="h-6 w-6" />
+              </div>
+              <div>
+                <h4 className="font-black text-gray-900 text-sm">Verification Failed</h4>
+                <p className="text-xs text-red-600 font-bold">Reason: {localUser.rejectionReason || 'Documents were not clear or invalid.'}</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => navigate('/onboarding')}
+              className="px-6 py-3 bg-red-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-600/20"
+            >
+              Re-submit Documents
+            </button>
+          </div>
+        ) : null}
+      </div>
+    );
   };
 
   const handleDecline = (orderId: string) => {
@@ -310,6 +357,7 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
         <div className="flex-1 p-6 lg:p-10 max-w-6xl mx-auto w-full">
           {activeTab === 'jobs' ? (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <VerificationBanner />
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div className="space-y-1">
                   <h2 className="text-3xl font-black text-gray-900 tracking-tight">Active Missions</h2>

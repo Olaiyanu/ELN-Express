@@ -51,9 +51,18 @@ const LandingPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [activeService, setActiveService] = useState<number | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const t = translations.landing;
   const common = translations.common;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -65,20 +74,36 @@ const LandingPage: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen selection:bg-eln/10">
       {/* Enhanced Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-xl z-50 border-b border-gray-100 transition-all duration-300">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+        isScrolled 
+          ? 'py-4' 
+          : 'py-8'
+      }`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="flex justify-between items-center h-20">
+          <div className={`flex justify-between items-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+            isScrolled 
+              ? 'bg-white/80 backdrop-blur-2xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] rounded-[2.5rem] px-8 h-16' 
+              : 'bg-transparent h-20'
+          }`}>
             <div className="flex items-center space-x-3">
-              <Logo className="h-7" showText={true} />
+              <Logo 
+                className={`transition-all duration-500 ${isScrolled ? 'h-6 scale-90' : 'h-7 scale-110'}`} 
+                showText={true} 
+                variant={isScrolled ? 'default' : 'white'}
+              />
             </div>
             
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-10">
               <div className="relative">
                 <button 
                   onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
                   onBlur={() => setTimeout(() => setIsLangDropdownOpen(false), 200)}
-                  className="flex items-center space-x-2 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors text-[10px] font-black uppercase tracking-widest text-gray-500"
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 text-[10px] font-black uppercase tracking-widest ${
+                    isScrolled 
+                      ? 'text-gray-500 hover:bg-gray-100' 
+                      : 'text-white/80 hover:bg-white/10'
+                  }`}
                 >
                   <span>{LANG_NAMES[lang]}</span>
                   <ChevronDown className={`h-3 w-3 transition-transform duration-300 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
@@ -90,13 +115,13 @@ const LandingPage: React.FC = () => {
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute top-full right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 overflow-hidden"
+                      className="absolute top-full right-0 mt-4 w-44 bg-white rounded-[2rem] shadow-2xl border border-gray-100 py-3 z-50 overflow-hidden"
                     >
                       {(Object.keys(LANG_NAMES) as Array<Language>).map((l) => (
                         <button
                           key={l}
                           onClick={() => { setLang(l); setIsLangDropdownOpen(false); }}
-                          className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-colors ${lang === l ? 'text-eln bg-eln/5' : 'text-gray-500 hover:bg-gray-50'}`}
+                          className={`w-full text-left px-6 py-3.5 text-[10px] font-black uppercase tracking-widest transition-all ${lang === l ? 'text-eln bg-eln/5' : 'text-gray-500 hover:bg-gray-50'}`}
                         >
                           {LANG_NAMES[l]}
                         </button>
@@ -106,10 +131,16 @@ const LandingPage: React.FC = () => {
                 </AnimatePresence>
               </div>
               
-              <Link to="/login" className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-eln transition-colors">
+              <Link to="/login" className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                isScrolled ? 'text-gray-500 hover:text-eln' : 'text-white/80 hover:text-white'
+              }`}>
                 {common.login}
               </Link>
-              <Link to="/signup" className="px-6 py-3 bg-eln text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-eln/20 hover:scale-105 active:scale-95 transition-all">
+              <Link to="/signup" className={`px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 shadow-xl active:scale-95 ${
+                isScrolled 
+                  ? 'bg-eln text-white shadow-eln/20 hover:shadow-eln/30' 
+                  : 'bg-white text-gray-900 shadow-white/10 hover:shadow-white/20'
+              }`}>
                 {common.joinNow}
               </Link>
             </div>
@@ -119,7 +150,9 @@ const LandingPage: React.FC = () => {
               <div className="relative">
                 <button 
                   onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                  className="flex items-center space-x-1 px-3 py-2 rounded-full bg-gray-50 text-[10px] font-black text-gray-500"
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-full text-[10px] font-black transition-all ${
+                    isScrolled ? 'bg-gray-100 text-gray-500' : 'bg-white/10 text-white'
+                  }`}
                 >
                   <span>{lang.toUpperCase()}</span>
                 </button>
@@ -130,13 +163,13 @@ const LandingPage: React.FC = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full right-0 mt-2 w-32 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                      className="absolute top-full right-0 mt-4 w-36 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2.5 z-50"
                     >
                       {(Object.keys(LANG_NAMES) as Array<Language>).map((l) => (
                         <button
                           key={l}
                           onClick={() => { setLang(l); setIsLangDropdownOpen(false); }}
-                          className={`w-full text-left px-4 py-2.5 text-[10px] font-black uppercase tracking-widest ${lang === l ? 'text-eln' : 'text-gray-500'}`}
+                          className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase tracking-widest ${lang === l ? 'text-eln' : 'text-gray-500'}`}
                         >
                           {LANG_NAMES[l]}
                         </button>
@@ -148,7 +181,9 @@ const LandingPage: React.FC = () => {
               
               <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-gray-900 hover:bg-gray-50 rounded-xl transition-colors"
+                className={`p-2.5 rounded-full transition-all ${
+                  isScrolled ? 'bg-gray-100 text-gray-900' : 'bg-white/10 text-white'
+                }`}
               >
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>

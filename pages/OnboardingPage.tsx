@@ -12,10 +12,14 @@ import {
   MapPin, 
   Sparkles,
   Camera,
-  ChevronRight
+  ChevronRight,
+  FileText,
+  Upload,
+  Loader2
 } from 'lucide-react';
-import { User, UserRole } from '../types';
+import { User, UserRole, VerificationStatus } from '../types';
 import { useLanguage } from '../src/contexts/LanguageContext';
+import { mockDb } from '../services/mockDb';
 
 interface OnboardingPageProps {
   user: User | null;
@@ -26,17 +30,32 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
   const t = translations.onboarding;
 
   const [step, setStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verificationData, setVerificationData] = useState({
+    idCardUrl: '',
+    selfieUrl: '',
+    plateNumber: ''
+  });
   const navigate = useNavigate();
 
   if (!user) {
     return <Navigate to="/login" />;
   }
 
-  const handleComplete = () => {
-    if (user.role === UserRole.MERCHANT) {
-      navigate('/merchant-dashboard');
-    } else {
+  const handleComplete = async () => {
+    if (user.role === UserRole.RIDER) {
+      setIsSubmitting(true);
+      // Simulate upload delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      mockDb.submitVerification(user.uid, {
+        idCardUrl: verificationData.idCardUrl || 'https://picsum.photos/seed/id/400/300',
+        selfieUrl: verificationData.selfieUrl || 'https://picsum.photos/seed/selfie/400/300',
+        plateNumber: verificationData.plateNumber || 'LAG-123-ABC'
+      });
+      setIsSubmitting(false);
       navigate('/rider-dashboard');
+    } else {
+      navigate('/merchant-dashboard');
     }
   };
 
@@ -215,22 +234,68 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
     {
       title: t.verification,
       description: t.verificationDesc,
-      icon: <Sparkles className="h-12 w-12 text-eln" />,
+      icon: <ShieldCheck className="h-12 w-12 text-eln" />,
       content: (
         <div className="space-y-6">
-          <p className="text-gray-500 font-medium leading-relaxed">
-            Our verification process ensures the safety of all high-value items. You'll need to upload:
-          </p>
-          <div className="grid grid-cols-3 gap-3">
-            {['Govt. ID', 'Selfie', 'Plate No.'].map(item => (
-              <div key={item} className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                <p className="text-[10px] font-black uppercase tracking-widest text-eln">{item}</p>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Government ID Card</label>
+              <div className="relative group">
+                <input 
+                  type="file" 
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10" 
+                  onChange={(e) => setVerificationData({...verificationData, idCardUrl: e.target.value})}
+                />
+                <div className="w-full p-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-between group-hover:border-eln group-hover:bg-eln/5 transition-all">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                      <FileText className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <span className="text-sm font-bold text-gray-500">
+                      {verificationData.idCardUrl ? 'ID Uploaded' : 'Upload ID Card'}
+                    </span>
+                  </div>
+                  <Upload className="h-5 w-5 text-gray-300" />
+                </div>
               </div>
-            ))}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Selfie Verification</label>
+              <div className="relative group">
+                <input 
+                  type="file" 
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10" 
+                  onChange={(e) => setVerificationData({...verificationData, selfieUrl: e.target.value})}
+                />
+                <div className="w-full p-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-between group-hover:border-eln group-hover:bg-eln/5 transition-all">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                      <Camera className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <span className="text-sm font-bold text-gray-500">
+                      {verificationData.selfieUrl ? 'Selfie Captured' : 'Take a Selfie'}
+                    </span>
+                  </div>
+                  <Upload className="h-5 w-5 text-gray-300" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Vehicle Plate Number</label>
+              <input 
+                type="text" 
+                placeholder="e.g. LAG-123-ABC"
+                value={verificationData.plateNumber}
+                onChange={(e) => setVerificationData({...verificationData, plateNumber: e.target.value})}
+                className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-gray-900 focus:ring-2 focus:ring-eln focus:bg-white transition-all"
+              />
+            </div>
           </div>
           <div className="bg-orange-50 p-6 rounded-3xl border border-orange-100">
             <p className="text-xs font-medium text-orange-700 leading-relaxed">
-              Note: You can browse the app now, but you won't receive delivery requests until verified.
+              Note: Our compliance team will review your documents within 24 hours.
             </p>
           </div>
         </div>
@@ -281,10 +346,17 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
 
             <button 
               onClick={() => step < steps.length - 1 ? setStep(step + 1) : handleComplete()}
-              className="w-full py-5 bg-eln text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-eln/20 flex items-center justify-center space-x-3 active:scale-95 transition-all"
+              disabled={isSubmitting}
+              className="w-full py-5 bg-eln text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-eln/20 flex items-center justify-center space-x-3 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>{step === steps.length - 1 ? t.goDashboard : t.continue}</span>
-              {step === steps.length - 1 ? <Sparkles className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              {isSubmitting ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <>
+                  <span>{step === steps.length - 1 ? t.goDashboard : t.continue}</span>
+                  {step === steps.length - 1 ? <Sparkles className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                </>
+              )}
             </button>
           </div>
         </motion.div>
