@@ -33,6 +33,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
     natureOfGoods: '',
     idCardUrl: ''
   });
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -84,6 +85,12 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
     const passwordError = validatePassword(formData.password);
     if (passwordError) {
       setError(passwordError);
+      setIsLoading(false);
+      return;
+    }
+
+    if (!agreedToTerms) {
+      setError('You must agree to the terms and conditions');
       setIsLoading(false);
       return;
     }
@@ -416,7 +423,29 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
             </motion.div>
           )}
 
-          <AuthButton type="submit" isLoading={isLoading} icon={ArrowRight}>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-center space-x-3 py-2"
+          >
+            <div className="relative flex items-center">
+              <input 
+                type="checkbox" 
+                id="terms"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                className="h-5 w-5 rounded-lg border-2 border-gray-200 text-eln focus:ring-eln transition-all cursor-pointer appearance-none checked:bg-eln checked:border-eln"
+              />
+              {agreedToTerms && (
+                <ShieldCheck className="absolute h-3 w-3 text-white left-1 pointer-events-none" />
+              )}
+            </div>
+            <label htmlFor="terms" className="text-[10px] font-black uppercase tracking-widest text-gray-500 cursor-pointer select-none">
+              I agree the terms and conditions
+            </label>
+          </motion.div>
+
+          <AuthButton type="submit" isLoading={isLoading} icon={ArrowRight} disabled={!agreedToTerms}>
             {t.completeRegistration}
           </AuthButton>
         </form>

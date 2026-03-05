@@ -50,7 +50,6 @@ const LandingPage: React.FC = () => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
-  const [activeService, setActiveService] = useState<number | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const t = translations.landing;
@@ -429,18 +428,17 @@ const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ delay: idx * 0.15, duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-                onClick={() => setActiveService(activeService === idx ? null : idx)}
-                className={`relative group h-[400px] sm:h-[500px] rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden shadow-2xl shadow-black/5 cursor-pointer transition-all duration-500 ${activeService === idx ? 'ring-4 ring-eln/20' : ''}`}
+                className="relative group h-[450px] sm:h-[550px] rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden shadow-2xl shadow-black/5 transition-all duration-500"
               >
                 {/* Background Image with Overlay */}
-                <div className={`absolute inset-0 transition-transform duration-1000 ease-out ${activeService === idx ? 'scale-110' : 'group-hover:scale-105'}`}>
+                <div className="absolute inset-0 transition-transform duration-1000 ease-out group-hover:scale-105">
                   <img 
                     src={service.image} 
                     alt={service.title}
-                    className={`w-full h-full object-cover transition-all duration-700 ${activeService === idx ? 'grayscale-0' : 'grayscale group-hover:grayscale-[0.5]'}`}
+                    className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
                     referrerPolicy="no-referrer"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent transition-opacity duration-500 ${activeService === idx ? 'opacity-95' : 'opacity-80 group-hover:opacity-85'}`}></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent opacity-90"></div>
                 </div>
                 
                 {/* Content */}
@@ -456,25 +454,22 @@ const LandingPage: React.FC = () => {
                     </div>
                   </motion.div>
 
-                  <div className={`space-y-4 transition-transform duration-500 ease-out ${activeService === idx ? 'translate-y-0' : 'translate-y-10 sm:translate-y-12'}`}>
+                  <div className="space-y-4">
                     <div className="flex items-center space-x-3">
                       <span className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[8px] font-black uppercase tracking-widest text-white/80">
                         {service.tag}
                       </span>
-                      {activeService !== idx && (
-                        <span className="text-[8px] font-black uppercase tracking-widest text-white/40 animate-pulse">Tap for details</span>
-                      )}
                     </div>
                     
                     <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">
                       {service.title}
                     </h3>
                     
-                    <p className={`text-white/60 font-medium leading-relaxed text-sm transition-opacity duration-500 ${activeService === idx ? 'opacity-100' : 'opacity-0'}`}>
+                    <p className="text-white/60 font-medium leading-relaxed text-sm">
                       {service.desc}
                     </p>
 
-                    <div className={`pt-6 flex items-center justify-between transition-all duration-500 ${activeService === idx ? 'opacity-100' : 'opacity-0'}`}>
+                    <div className="pt-6 flex items-center justify-between transition-all duration-500">
                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Service 0{idx + 1}</span>
                       <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-gray-900">
                         <ArrowRight className="h-5 w-5" />
