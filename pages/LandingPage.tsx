@@ -360,39 +360,6 @@ const LandingPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Partner Marquee: Auto-Horizontal Scrolling */}
-      <div className="overflow-hidden py-12 border-y border-gray-100 bg-white relative">
-        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10"></div>
-        
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="flex whitespace-nowrap animate-marquee"
-        >
-          <div className="flex space-x-16 items-center px-8">
-            {[
-              "ZARA", "GUCCI", "PRADA", "NIKE", "ADIDAS", "H&M", "UNIQLO", "ASOS", "FARFETCH", "VOGUE", "CHANEL", "DIOR", "HERMÈS"
-            ].map((brand) => (
-              <span key={brand} className="text-3xl sm:text-5xl font-black text-gray-100 tracking-tighter hover:text-eln transition-colors cursor-default select-none">
-                {brand}
-              </span>
-            ))}
-          </div>
-          {/* Duplicate for seamless loop */}
-          <div className="flex space-x-16 items-center px-8">
-            {[
-              "ZARA", "GUCCI", "PRADA", "NIKE", "ADIDAS", "H&M", "UNIQLO", "ASOS", "FARFETCH", "VOGUE", "CHANEL", "DIOR", "HERMÈS"
-            ].map((brand) => (
-              <span key={`${brand}-dup`} className="text-3xl sm:text-5xl font-black text-gray-100 tracking-tighter hover:text-eln transition-colors cursor-default select-none">
-                {brand}
-              </span>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-
       {/* MVP Features: No fluff, just utility */}
       <section id="services" className="py-32 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
