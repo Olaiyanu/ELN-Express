@@ -18,11 +18,14 @@ import {
   ToggleRight,
   Wallet,
   Bell,
-  ArrowRight
+  ArrowRight,
+  Camera,
+  Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Logo from '../components/Logo';
 import RiderMap from '../components/RiderMap';
+import NotificationBell from '../components/NotificationBell';
 import { User as UserType, Order, OrderStatus, VerificationStatus, Notification } from '../types';
 import { mockDb } from '../services/mockDb';
 import { useLanguage } from '../src/contexts/LanguageContext';
@@ -45,14 +48,15 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
   const [riderLocation, setRiderLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [allPendingOrders, setAllPendingOrders] = useState<Order[]>([]);
   const [localUser, setLocalUser] = useState<UserType>(user);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: localUser.name,
+    phone: localUser.phone || '',
+    profilePicture: localUser.profilePicture || '',
+    plateNumber: localUser.plateNumber || ''
+  });
   const navigate = useNavigate();
-
-  const refreshNotifications = () => {
-    const data = mockDb.getNotifications(user.uid);
-    setNotifications(data);
-  };
 
   const fetchOrders = () => {
     const all = mockDb.getOrders();
@@ -81,7 +85,6 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     
     refreshUser();
     fetchOrders();
-    refreshNotifications();
     
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -93,7 +96,6 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     const interval = setInterval(() => {
       refreshUser();
       fetchOrders();
-      refreshNotifications();
     }, 3000);
     return () => clearInterval(interval);
   }, [user.uid]);
@@ -106,6 +108,36 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     localStorage.setItem('eln_current_user', JSON.stringify(updatedUser));
   };
 
+  const handleUpdateProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingProfile(true);
+    
+    setTimeout(() => {
+      const updatedUser = {
+        ...localUser,
+        name: profileForm.name,
+        phone: profileForm.phone,
+        profilePicture: profileForm.profilePicture,
+        plateNumber: profileForm.plateNumber
+      };
+      mockDb.saveUser(updatedUser);
+      setLocalUser(updatedUser);
+      setIsSavingProfile(false);
+      setShowProfileModal(false);
+    }, 1000);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileForm({ ...profileForm, profilePicture: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAccept = (orderId: string) => {
     if (localUser.verificationStatus !== VerificationStatus.VERIFIED) {
       alert('Your account must be verified before you can accept delivery missions.');
@@ -115,43 +147,117 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     fetchOrders();
   };
 
-  const VerificationBanner = () => {
-    if (localUser.verificationStatus === VerificationStatus.VERIFIED) return null;
+  const isVerified = localUser.verificationStatus === VerificationStatus.VERIFIED;
 
+  const VerificationHub = () => {
     return (
-      <div className="mb-8 animate-in slide-in-from-top duration-500">
-        {localUser.verificationStatus === VerificationStatus.PENDING ? (
-          <div className="bg-eln/5 border border-eln/10 p-6 rounded-[2rem] flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="h-12 w-12 bg-eln/10 rounded-2xl flex items-center justify-center text-eln">
-                <RefreshCw className="h-6 w-6 animate-spin-slow" />
-              </div>
-              <div>
-                <h4 className="font-black text-gray-900 text-sm">Verification in Progress</h4>
-                <p className="text-xs text-gray-500 font-medium">Our team is reviewing your documents. This usually takes less than 24 hours.</p>
-              </div>
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-10">
+        <div className="max-w-2xl w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-eln/5 rounded-full text-eln text-[10px] font-black uppercase tracking-widest mb-4">
+              <span>Account Verification</span>
             </div>
-            <span className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-eln bg-white px-4 py-2 rounded-xl border border-eln/10">Pending Review</span>
+            <h2 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight leading-none">
+              {localUser.verificationStatus === VerificationStatus.PENDING 
+                ? "We're Reviewing Your Profile" 
+                : localUser.verificationStatus === VerificationStatus.REJECTED 
+                ? "Verification Update" 
+                : "Complete Your Profile"}
+            </h2>
+            <p className="text-gray-500 text-lg font-medium max-w-lg mx-auto">
+              {localUser.verificationStatus === VerificationStatus.PENDING 
+                ? "Your documents are currently being vetted by our security team. You'll get full access once approved." 
+                : localUser.verificationStatus === VerificationStatus.REJECTED 
+                ? "There was an issue with your documents. Please review the feedback and re-submit." 
+                : "To start earning as a professional rider, you need to submit your identification documents for approval."}
+            </p>
           </div>
-        ) : localUser.verificationStatus === VerificationStatus.REJECTED ? (
-          <div className="bg-red-50 border border-red-100 p-6 rounded-[2rem] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center space-x-4">
-              <div className="h-12 w-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600">
-                <Ban className="h-6 w-6" />
-              </div>
-              <div>
-                <h4 className="font-black text-gray-900 text-sm">Verification Failed</h4>
-                <p className="text-xs text-red-600 font-bold">Reason: {localUser.rejectionReason || 'Documents were not clear or invalid.'}</p>
-              </div>
+
+          <div className="bg-white rounded-[3rem] shadow-2xl shadow-black/5 border border-gray-100 p-8 sm:p-12 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8">
+              <div className={`h-3 w-3 rounded-full animate-pulse ${
+                localUser.verificationStatus === VerificationStatus.PENDING ? 'bg-orange-500' : 
+                localUser.verificationStatus === VerificationStatus.REJECTED ? 'bg-red-500' : 'bg-gray-300'
+              }`} />
             </div>
-            <button 
-              onClick={() => navigate('/onboarding')}
-              className="px-6 py-3 bg-red-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-600/20"
-            >
-              Re-submit Documents
+
+            <div className="space-y-8 relative z-10">
+              {localUser.verificationStatus === VerificationStatus.PENDING ? (
+                <div className="space-y-8">
+                  <div className="flex items-center space-x-6">
+                    <div className="h-20 w-20 bg-eln/5 rounded-[2rem] flex items-center justify-center text-eln">
+                      <RefreshCw className="h-10 w-10 animate-spin-slow" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-eln mb-1">Current Status</p>
+                      <p className="text-2xl font-black text-gray-900">Pending Approval</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Estimated Time</p>
+                      <p className="text-lg font-black text-gray-900">12-24 Hours</p>
+                    </div>
+                    <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Next Step</p>
+                      <p className="text-lg font-black text-gray-900">Wait for Email</p>
+                    </div>
+                  </div>
+                </div>
+              ) : localUser.verificationStatus === VerificationStatus.REJECTED ? (
+                <div className="space-y-8">
+                  <div className="flex items-center space-x-6">
+                    <div className="h-20 w-20 bg-red-50 rounded-[2rem] flex items-center justify-center text-red-600">
+                      <Ban className="h-10 w-10" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-red-600 mb-1">Action Required</p>
+                      <p className="text-2xl font-black text-gray-900">Verification Rejected</p>
+                    </div>
+                  </div>
+                  <div className="p-8 bg-red-50/50 rounded-3xl border border-red-100">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-red-400 mb-3">Admin Feedback</p>
+                    <p className="text-base font-bold text-red-900 leading-relaxed italic">
+                      "{localUser.rejectionReason || 'The uploaded documents were not clear enough for verification. Please ensure your ID is fully visible and the selfie is well-lit.'}"
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => navigate('/onboarding')}
+                    className="w-full py-6 bg-red-600 text-white rounded-full font-black text-sm uppercase tracking-widest shadow-2xl shadow-red-600/20 flex items-center justify-center space-x-3 hover:scale-[1.02] active:scale-95 transition-all"
+                  >
+                    <span>Re-submit Documents</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  <div className="flex items-center space-x-6">
+                    <div className="h-20 w-20 bg-gray-50 rounded-[2rem] flex items-center justify-center text-gray-400">
+                      <Bike className="h-10 w-10" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Account Ready</p>
+                      <p className="text-2xl font-black text-gray-900">Start Onboarding</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => navigate('/onboarding')}
+                    className="w-full py-6 bg-eln text-white rounded-full font-black text-sm uppercase tracking-widest shadow-2xl shadow-eln/30 flex items-center justify-center space-x-3 hover:scale-[1.02] active:scale-95 transition-all"
+                  >
+                    <span>Submit Documents</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <button onClick={onLogout} className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-red-500 transition-colors">
+              Logout and try another account
             </button>
           </div>
-        ) : null}
+        </div>
       </div>
     );
   };
@@ -165,80 +271,6 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     mockDb.updateOrderStatus(orderId, status);
     fetchOrders();
   };
-
-  const NotificationBell = () => (
-    <div className="relative">
-      <button 
-        onClick={() => setShowNotifications(!showNotifications)}
-        className="p-2 bg-gray-50 rounded-xl text-gray-600 hover:bg-eln hover:text-white transition-all relative border border-gray-100"
-      >
-        <Bell className="h-5 w-5" />
-        {notifications.filter(n => !n.read).length > 0 && (
-          <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[8px] font-black flex items-center justify-center rounded-full border-2 border-white">
-            {notifications.filter(n => !n.read).length}
-          </span>
-        )}
-      </button>
-
-      <AnimatePresence>
-        {showNotifications && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm" 
-              onClick={() => setShowNotifications(false)} 
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh] z-10"
-            >
-              <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                <h4 className="font-black text-xs uppercase tracking-widest text-gray-900">Job Notifications</h4>
-                <button onClick={() => setShowNotifications(false)} className="p-2 text-gray-400 hover:text-gray-600">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {notifications.length > 0 ? (
-                  notifications.map(n => (
-                    <div 
-                      key={n.id} 
-                      onClick={() => {
-                        mockDb.markNotificationRead(n.id);
-                        refreshNotifications();
-                      }}
-                      className={`p-4 rounded-2xl transition-all cursor-pointer border ${n.read ? 'bg-white border-gray-100' : 'bg-eln/5 border-eln/10'}`}
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${n.read ? 'bg-gray-100 text-gray-400' : 'bg-eln text-white'}`}>
-                          <Bell className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-black text-gray-900 mb-0.5">{n.title}</p>
-                          <p className="text-[11px] text-gray-500 leading-relaxed">{n.message}</p>
-                          <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mt-2">{new Date(n.createdAt).toLocaleTimeString()}</p>
-                        </div>
-                        {!n.read && <div className="h-2 w-2 bg-eln rounded-full mt-1" />}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="py-12 text-center text-gray-400">
-                    <Bell className="h-8 w-8 mx-auto mb-3 opacity-20" />
-                    <p className="text-[10px] font-black uppercase tracking-widest">No notifications</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full py-8 px-4">
@@ -274,15 +306,18 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
 
       <div className="mt-auto pt-8 border-t border-white/5">
         <div className="px-4 mb-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="h-10 w-10 rounded-xl bg-white/10 overflow-hidden">
+          <button 
+            onClick={() => setShowProfileModal(true)}
+            className="flex items-center space-x-3 mb-4 w-full text-left group"
+          >
+            <div className="h-10 w-10 rounded-xl bg-white/10 overflow-hidden group-hover:ring-2 group-hover:ring-white/20 transition-all">
               <img src={localUser.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(localUser.name)}&background=034287&color=fff`} alt="" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-black text-white truncate">{localUser.name}</p>
+              <p className="text-xs font-black text-white truncate group-hover:text-eln transition-colors">{localUser.name}</p>
               <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Professional Rider</p>
             </div>
-          </div>
+          </button>
           <button 
             onClick={handleToggleAvailability}
             className={`flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all ${localUser.isAvailable ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-white/30'}`}
@@ -319,51 +354,81 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
 
       {/* Mobile Sidebar */}
       <aside className={`fixed inset-y-0 left-0 w-72 bg-eln z-50 transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <SidebarContent />
+        {isVerified ? <SidebarContent /> : (
+          <div className="p-8 flex flex-col h-full">
+            <Logo className="h-7 mb-12" showText={true} variant="white" />
+            <div className="mt-auto">
+              <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
+                <LogOut className="h-5 w-5" />
+                <span className="font-black text-xs uppercase tracking-widest">Logout</span>
+              </button>
+            </div>
+          </div>
+        )}
       </aside>
 
       {/* Desktop Sidebar */}
       <aside className="w-72 bg-eln flex flex-col hidden lg:flex h-screen sticky top-0">
-        <SidebarContent />
+        {isVerified ? <SidebarContent /> : (
+          <div className="p-8 flex flex-col h-full">
+            <Logo className="h-7 mb-12" showText={true} variant="white" />
+            <div className="mt-auto">
+              <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
+                <LogOut className="h-5 w-5" />
+                <span className="font-black text-xs uppercase tracking-widest">Logout</span>
+              </button>
+            </div>
+          </div>
+        )}
       </aside>
 
       <main className="flex-1 flex flex-col h-screen overflow-y-auto w-full">
         <header className="bg-white px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-30 border-b border-gray-100">
           <div className="flex items-center space-x-4">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-400 lg:hidden hover:bg-gray-50 rounded-xl transition-colors">
-              <Menu className="h-6 w-6" />
-            </button>
+            {isVerified && (
+              <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-400 lg:hidden hover:bg-gray-50 rounded-xl transition-colors">
+                <Menu className="h-6 w-6" />
+              </button>
+            )}
             <h1 className="font-black text-xs uppercase tracking-[0.2em] text-gray-400">
-              Rider Dashboard <span className="text-gray-200 mx-2">/</span> <span className="text-gray-900">{activeTab}</span>
+              Rider Dashboard <span className="text-gray-200 mx-2">/</span> <span className="text-gray-900">{isVerified ? activeTab : 'Verification'}</span>
             </h1>
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="hidden sm:flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
-              <span className={`text-[10px] font-black uppercase tracking-widest ${localUser.isAvailable ? 'text-green-600' : 'text-gray-400'}`}>
-                {localUser.isAvailable ? 'Available' : 'Offline'}
-              </span>
-              <button onClick={handleToggleAvailability} className="focus:outline-none">
-                {localUser.isAvailable ? <ToggleRight className="h-6 w-6 text-eln" /> : <ToggleLeft className="h-6 w-6 text-gray-300" />}
-              </button>
-            </div>
-            <NotificationBell />
+            {isVerified && (
+              <div className="hidden sm:flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
+                <span className={`text-[10px] font-black uppercase tracking-widest ${localUser.isAvailable ? 'text-green-600' : 'text-gray-400'}`}>
+                  {localUser.isAvailable ? 'Available' : 'Offline'}
+                </span>
+                <button onClick={handleToggleAvailability} className="focus:outline-none">
+                  {localUser.isAvailable ? <ToggleRight className="h-6 w-6 text-eln" /> : <ToggleLeft className="h-6 w-6 text-gray-300" />}
+                </button>
+              </div>
+            )}
+            {isVerified && <NotificationBell userId={user.uid} />}
             <button onClick={fetchOrders} className="p-2 bg-gray-50 rounded-xl text-gray-400 hover:text-eln hover:bg-eln/5 transition-colors border border-gray-100">
               <RefreshCw className="h-5 w-5" />
+            </button>
+            <button 
+              onClick={() => setShowProfileModal(true)}
+              className="h-10 w-10 rounded-xl bg-gray-50 overflow-hidden border border-gray-100 hover:ring-2 hover:ring-eln transition-all"
+            >
+              <img src={localUser.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(localUser.name)}&background=034287&color=fff`} alt="" className="h-full w-full object-cover" />
             </button>
           </div>
         </header>
 
-        <div className="flex-1 p-6 lg:p-10 max-w-6xl mx-auto w-full">
-          {activeTab === 'jobs' ? (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <VerificationBanner />
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                <div className="space-y-1">
-                  <h2 className="text-3xl font-black text-gray-900 tracking-tight">Active Missions</h2>
-                  <p className="text-sm text-gray-500 font-medium">Manage your current deliveries and incoming requests.</p>
+        {isVerified ? (
+          <div className="flex-1 p-6 lg:p-10 max-w-6xl mx-auto w-full">
+            {activeTab === 'jobs' ? (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                  <div className="space-y-1">
+                    <h2 className="text-3xl font-black text-gray-900 tracking-tight">Active Missions</h2>
+                    <p className="text-sm text-gray-500 font-medium">Manage your current deliveries and incoming requests.</p>
+                  </div>
                 </div>
-              </div>
 
               {!localUser.isAvailable && (
                 <div className="bg-white p-12 rounded-[2.5rem] text-center space-y-6 border border-dashed border-gray-200 shadow-sm">
@@ -624,7 +689,88 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
             </div>
           )}
         </div>
+      ) : (
+        <VerificationHub />
+      )}
       </main>
+      <AnimatePresence>
+        {showProfileModal && (
+          <div className="fixed inset-0 bg-eln/60 backdrop-blur-lg z-[120] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-8 sm:p-12 space-y-8"
+            >
+              <div className="flex justify-between items-center">
+                <h3 className="text-2xl font-black text-gray-900">Edit Profile</h3>
+                <button onClick={() => setShowProfileModal(false)} className="p-3 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateProfile} className="space-y-6">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative group">
+                    <div className="h-24 w-24 rounded-[2rem] overflow-hidden bg-gray-100 border-2 border-gray-100">
+                      <img 
+                        src={profileForm.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(localUser.name)}&background=034287&color=fff`} 
+                        alt="" 
+                        className="h-full w-full object-cover" 
+                      />
+                    </div>
+                    <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 rounded-[2rem] cursor-pointer transition-opacity">
+                      <Camera className="h-6 w-6" />
+                      <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                    </label>
+                  </div>
+                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Click to change photo</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Full Name</label>
+                    <input 
+                      required 
+                      type="text" 
+                      value={profileForm.name} 
+                      onChange={e => setProfileForm({...profileForm, name: e.target.value})} 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Phone Number</label>
+                    <input 
+                      required 
+                      type="tel" 
+                      value={profileForm.phone} 
+                      onChange={e => setProfileForm({...profileForm, phone: e.target.value})} 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Plate Number</label>
+                    <input 
+                      type="text" 
+                      value={profileForm.plateNumber} 
+                      onChange={e => setProfileForm({...profileForm, plateNumber: e.target.value})} 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={isSavingProfile}
+                  className="w-full py-5 bg-eln text-white font-black rounded-2xl shadow-2xl shadow-eln/40 uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                >
+                  {isSavingProfile ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : 'Save Changes'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -20,9 +20,11 @@ import {
   Check,
   Star,
   MessageSquare,
-  Bike
+  Bike,
+  Camera
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import NotificationBell from '../components/NotificationBell';
 import { User as UserType, Order, OrderStatus, Notification } from '../types';
 import { mockDb } from '../services/mockDb';
 import { useLanguage } from '../src/contexts/LanguageContext';
@@ -38,9 +40,19 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'request' | 'history' | 'estimate'>('request');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedRider, setSelectedRider] = useState<UserType | null>(null);
+  
+  // Profile Form State
+  const [profileForm, setProfileForm] = useState({
+    name: user.name,
+    businessName: user.businessName || '',
+    phone: user.phone || '',
+    profilePicture: user.profilePicture || ''
+  });
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   
   // Price Estimate State
   const [estimateData, setEstimateData] = useState({ pickup: 'Victoria Island', dropoff: '', weight: 'Standard' });
@@ -149,6 +161,39 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
     if (rider) setSelectedRider(rider);
   };
 
+  const handleUpdateProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingProfile(true);
+    
+    setTimeout(() => {
+      const updatedUser = {
+        ...user,
+        name: profileForm.name,
+        businessName: profileForm.businessName,
+        phone: profileForm.phone,
+        profilePicture: profileForm.profilePicture
+      };
+      mockDb.saveUser(updatedUser);
+      setIsSavingProfile(false);
+      setShowProfileModal(false);
+      // In a real app, we'd update the global user state. 
+      // For this demo, we'll suggest a refresh or the parent will handle it if we pass a callback.
+      // Since 'user' is a prop, we should ideally have an 'onUpdateUser' prop.
+      window.location.reload(); // Simplest way to reflect changes in this mock setup
+    }, 1000);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileForm({ ...profileForm, profilePicture: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const SidebarContent = () => (
     <div className="flex flex-col h-full py-8 px-4">
       <div className="flex items-center space-x-3 px-4 mb-12">
@@ -179,16 +224,6 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
           <DollarSign className={`h-5 w-5 ${activeTab === 'estimate' ? 'text-white' : 'text-white/30'}`} />
           <span className="font-black text-xs uppercase tracking-widest">Price Estimate</span>
         </button>
-
-        <a 
-          href="https://wa.me/2348000000000" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="flex items-center space-x-3 w-full px-5 py-4 rounded-2xl text-white/50 hover:text-green-400 hover:bg-green-500/10 transition-all"
-        >
-          <MessageSquare className="h-5 w-5 text-white/30" />
-          <span className="font-black text-xs uppercase tracking-widest">WhatsApp Support</span>
-        </a>
       </nav>
 
       <div className="mt-auto pt-8 border-t border-white/5">
@@ -236,9 +271,13 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
             </h1>
           </div>
           <div className="flex items-center space-x-4">
-             <div className="h-10 w-10 rounded-xl bg-gray-50 overflow-hidden border border-gray-100">
+             <NotificationBell userId={user.uid} />
+             <button 
+               onClick={() => setShowProfileModal(true)}
+               className="h-10 w-10 rounded-xl bg-gray-50 overflow-hidden border border-gray-100 hover:ring-2 hover:ring-eln transition-all"
+             >
                 <img src={user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=034287&color=fff`} alt="" className="h-full w-full object-cover" />
-             </div>
+             </button>
           </div>
         </header>
 
@@ -521,6 +560,104 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
           </div>
         )}
       </AnimatePresence>
+
+      {/* Profile Edit Modal */}
+      <AnimatePresence>
+        {showProfileModal && (
+          <div className="fixed inset-0 bg-eln/60 backdrop-blur-lg z-[120] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-8 sm:p-12 space-y-8"
+            >
+              <div className="flex justify-between items-center">
+                <h3 className="text-2xl font-black text-gray-900">Edit Profile</h3>
+                <button onClick={() => setShowProfileModal(false)} className="p-3 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateProfile} className="space-y-6">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative group">
+                    <div className="h-24 w-24 rounded-[2rem] overflow-hidden bg-gray-100 border-2 border-gray-100">
+                      <img 
+                        src={profileForm.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=034287&color=fff`} 
+                        alt="" 
+                        className="h-full w-full object-cover" 
+                      />
+                    </div>
+                    <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 rounded-[2rem] cursor-pointer transition-opacity">
+                      <Camera className="h-6 w-6" />
+                      <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                    </label>
+                  </div>
+                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Click to change photo</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Full Name</label>
+                    <input 
+                      required 
+                      type="text" 
+                      value={profileForm.name} 
+                      onChange={e => setProfileForm({...profileForm, name: e.target.value})} 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Business Name</label>
+                    <input 
+                      required 
+                      type="text" 
+                      value={profileForm.businessName} 
+                      onChange={e => setProfileForm({...profileForm, businessName: e.target.value})} 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Phone Number</label>
+                    <input 
+                      required 
+                      type="tel" 
+                      value={profileForm.phone} 
+                      onChange={e => setProfileForm({...profileForm, phone: e.target.value})} 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={isSavingProfile}
+                  className="w-full py-5 bg-eln text-white font-black rounded-2xl shadow-2xl shadow-eln/40 uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                >
+                  {isSavingProfile ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : 'Save Changes'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating WhatsApp Support */}
+      <motion.a 
+        href="https://wa.me/2348000000000" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        className="fixed bottom-8 right-8 z-[100] h-16 w-16 bg-green-500 text-white rounded-full flex items-center justify-center shadow-2xl shadow-green-500/40 hover:bg-green-600 transition-all group"
+      >
+        <MessageSquare className="h-8 w-8" />
+        <span className="absolute right-full mr-4 px-4 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          WhatsApp Support
+        </span>
+      </motion.a>
     </div>
   );
 };

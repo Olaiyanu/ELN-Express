@@ -261,7 +261,11 @@ const AdminOrders = () => {
   const [showAssignModal, setShowAssignModal] = useState<Order | null>(null);
   const [riderSearch, setRiderSearch] = useState('');
   
-  const riders = mockDb.getUsers().filter(u => u.role === UserRole.RIDER && u.verificationStatus === VerificationStatus.VERIFIED);
+  const riders = mockDb.getUsers().filter(u => 
+    u.role === UserRole.RIDER && 
+    u.verificationStatus === VerificationStatus.VERIFIED &&
+    u.isAvailable === true
+  );
 
   const handleAssignRider = (rider: User) => {
     if (showAssignModal) {

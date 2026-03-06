@@ -20,6 +20,38 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage, Language } from '../src/contexts/LanguageContext';
 
+const Typewriter: React.FC<{ text: string; delay?: number; speed?: number }> = ({ text, delay = 0, speed = 50 }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    setDisplayedText('');
+    setIsComplete(false);
+    
+    const timeout = setTimeout(() => {
+      let i = 0;
+      const interval = setInterval(() => {
+        setDisplayedText(text.slice(0, i + 1));
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          setIsComplete(true);
+        }
+      }, speed);
+      return () => clearInterval(interval);
+    }, delay);
+
+    return () => clearTimeout(timeout);
+  }, [text, delay, speed]);
+
+  return (
+    <span>
+      {displayedText}
+      {!isComplete && <span className="typewriter-cursor" />}
+    </span>
+  );
+};
+
 const HERO_IMAGES = [
   {
     url: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2000&auto=format&fit=crop",
@@ -264,19 +296,13 @@ const LandingPage: React.FC = () => {
             key={`title-${lang}`}
             className="text-4xl sm:text-7xl lg:text-9xl font-black text-white leading-[1] tracking-tighter mb-8 transform -skew-x-6"
           >
-            <span className="reveal-text">
-              <span style={{ animationDelay: '0.1s' }}>{t.heroTitle1.split(' ')[0]}</span>
-            </span>{' '}
-            <span className="reveal-text">
-              <span style={{ animationDelay: '0.2s' }}>{t.heroTitle1.split(' ')[1]}</span>
-            </span>
+            <div className="reveal-text">
+              <Typewriter text={t.heroTitle1} delay={500} speed={70} />
+            </div>
             <br />
-            <span className="reveal-text text-white/80">
-              <span style={{ animationDelay: '0.4s' }}>{t.heroTitle2.split(' ')[0]}</span>
-            </span>{' '}
-            <span className="reveal-text text-white/80">
-              <span style={{ animationDelay: '0.5s' }}>{t.heroTitle2.split(' ')[1]}</span>
-            </span>
+            <div className="reveal-text text-white/80">
+              <Typewriter text={t.heroTitle2} delay={2000} speed={70} />
+            </div>
           </h1>
 
           <motion.p 
@@ -292,10 +318,10 @@ const LandingPage: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
+            transition={{ delay: 3.5 }}
             className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
           >
-            <Link to="/signup" className="w-full sm:w-auto px-8 sm:px-12 py-5 sm:py-6 bg-white text-gray-900 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-2xl shadow-white/10 flex items-center justify-center space-x-3 hover:bg-gray-100 transition-all">
+            <Link to="/signup" className="w-full sm:w-auto px-8 sm:px-12 py-5 sm:py-6 bg-white text-gray-900 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-2xl shadow-white/10 flex items-center justify-center space-x-3 hover:bg-gray-100 transition-all animate-glow border border-white/20">
               <span>{common.getStarted}</span>
               <ArrowRight className="h-5 w-5" />
             </Link>

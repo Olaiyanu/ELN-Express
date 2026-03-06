@@ -153,6 +153,19 @@ export const mockDb = {
         createdAt: Date.now()
       });
 
+      // Notify Rider if assigned
+      if (status === OrderStatus.ASSIGNED && riderId) {
+        mockDb.addNotification({
+          id: Math.random().toString(36).substring(2, 11),
+          userId: riderId,
+          title: 'New Mission Assigned',
+          message: `You have been assigned to order #${order.id.slice(0, 8)}. Check your active jobs.`,
+          type: 'order',
+          read: false,
+          createdAt: Date.now()
+        });
+      }
+
       // If order is delivered, update rider wallet
       if (status === OrderStatus.DELIVERED && oldStatus !== OrderStatus.DELIVERED && order.riderId) {
         const users = mockDb.getUsers();
@@ -215,6 +228,19 @@ export const mockDb = {
           mockDb.saveUser(rider);
         }
       }
+
+      // Notify Rider
+      mockDb.addNotification({
+        id: Math.random().toString(36).substring(2, 11),
+        userId: req.riderId,
+        title: `Withdrawal ${status === 'approved' ? 'Successful' : 'Rejected'}`,
+        message: status === 'approved' 
+          ? `Your withdrawal of ₦${req.amount.toLocaleString()} has been processed.` 
+          : `Your withdrawal of ₦${req.amount.toLocaleString()} was rejected.`,
+        type: 'withdrawal',
+        read: false,
+        createdAt: Date.now()
+      });
     }
   },
 
@@ -254,6 +280,13 @@ export const mockDb = {
     if (changed) {
       localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(all));
     }
+  },
+  
+  clearAllNotifications: (userId: string) => {
+    const data = localStorage.getItem(NOTIFICATIONS_KEY);
+    const all: Notification[] = data ? JSON.parse(data) : [];
+    const filtered = all.filter(n => n.userId !== userId);
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(filtered));
   },
 
   updateVerificationStatus: (uid: string, status: VerificationStatus, reason?: string) => {
