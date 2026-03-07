@@ -101,12 +101,12 @@ const PrivacyPage: React.FC = () => {
         </div>
 
         {/* Rights Section */}
-        <motion.section variants={itemVariants} className="bg-gray-900 p-12 sm:p-16 rounded-[4rem] text-white space-y-10 relative overflow-hidden shadow-2xl shadow-eln/20">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-eln/10 blur-[100px] rounded-full -mr-32 -mt-32"></div>
+        <motion.section variants={itemVariants} className="bg-eln-orange-deep p-12 sm:p-16 rounded-[4rem] text-white space-y-10 relative overflow-hidden shadow-2xl shadow-eln-orange-deep/20">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[100px] rounded-full -mr-32 -mt-32"></div>
           
           <div className="relative z-10 space-y-8">
             <div className="flex items-center space-x-4">
-              <UserCheck className="h-8 w-8 text-eln" />
+              <UserCheck className="h-8 w-8 text-white" />
               <h3 className="text-3xl font-black tracking-tight">{t.rightsTitle}</h3>
             </div>
             
@@ -118,7 +118,7 @@ const PrivacyPage: React.FC = () => {
                 { title: "Portability", desc: "Transfer your data to another service provider in a structured format." }
               ].map((right, i) => (
                 <div key={i} className="bg-white/5 p-8 rounded-3xl border border-white/10 space-y-2 hover:bg-white/10 transition-colors">
-                  <h4 className="font-black text-eln uppercase text-xs tracking-widest">{right.title}</h4>
+                  <h4 className="font-black text-white uppercase text-xs tracking-widest">{right.title}</h4>
                   <p className="text-white/60 font-medium text-sm leading-relaxed">{right.desc}</p>
                 </div>
               ))}

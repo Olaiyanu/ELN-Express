@@ -33,14 +33,26 @@
       body {
         font-family: 'Inter', sans-serif;
       }
-      .bg-eln-blue {
-        background-color: #034287;
+      .bg-eln-primary {
+        background-color: #FF7A00;
       }
-      .text-eln-blue {
-        color: #034287;
+      .text-eln-primary {
+        color: #FF7A00;
       }
-      .border-eln-blue {
-        border-color: #034287;
+      .border-eln-primary {
+        border-color: #FF7A00;
+      }
+      .bg-eln-orange-deep {
+        background-color: #E55A00;
+      }
+      .text-eln-orange-deep {
+        color: #E55A00;
+      }
+      .bg-gradient-eln {
+        background: linear-gradient(135deg, #FF7A00 0%, #FFB347 100%);
+      }
+      .bg-gradient-eln-deep {
+        background: linear-gradient(135deg, #FF7A00 0%, #E55A00 100%);
       }
     </style>
     <script>
@@ -49,14 +61,23 @@
           extend: {
             colors: {
               eln: {
-                DEFAULT: '#034287',
-                light: '#0456B0',
-                dark: '#022E5E'
+                DEFAULT: '#FF7A00',
+                primary: '#FF7A00',
+                orange: {
+                  light: '#FFB347',
+                  deep: '#E55A00'
+                },
+                bg: '#F5F6F8',
+                text: '#2E2E2E'
               }
             },
             borderRadius: {
               '4xl': '2rem',
               '5xl': '3rem',
+            },
+            backgroundImage: {
+              'gradient-eln': 'linear-gradient(135deg, #FF7A00 0%, #FFB347 100%)',
+              'gradient-eln-deep': 'linear-gradient(135deg, #FF7A00 0%, #E55A00 100%)',
             }
           }
         }
@@ -64,7 +85,7 @@
     </script>
     <link rel="stylesheet" href="/index.css">
   </head>
-  <body class="bg-gray-50 text-gray-900 overflow-x-hidden">
+  <body class="bg-eln-bg text-eln-text overflow-x-hidden">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

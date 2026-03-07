@@ -19,7 +19,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({
     <button
       {...props}
       disabled={isLoading || props.disabled}
-      className={`w-full py-6 bg-eln text-white font-black rounded-full hover:bg-eln-dark transition-all shadow-2xl shadow-eln/30 flex items-center justify-center space-x-3 uppercase text-sm tracking-widest active:scale-95 disabled:opacity-50 ${className}`}
+      className={`w-full py-6 bg-gradient-eln text-white font-black rounded-full hover:scale-[1.02] transition-all shadow-2xl shadow-eln-primary/30 flex items-center justify-center space-x-3 uppercase text-sm tracking-widest active:scale-95 disabled:opacity-50 ${className}`}
     >
       {isLoading ? (
         <Loader2 className="h-6 w-6 animate-spin" />

@@ -90,9 +90,9 @@ html {
   display: inline-block;
   width: 4px;
   height: 0.9em;
-  background-color: #034287; /* ELN Blue */
+  background-color: #FF7A00; /* ELN Orange */
   margin-left: 4px;
   vertical-align: baseline;
   animation: cursor-blink 1s infinite;
-  box-shadow: 0 0 10px rgba(3, 66, 135, 0.5);
+  box-shadow: 0 0 10px rgba(255, 122, 0, 0.5);
 }

@@ -107,12 +107,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isAdminOnly = false }) =
         <div className="space-y-6">
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-500 font-medium">
-              New to ELN? <Link to="/signup" className="text-eln font-black hover:underline tracking-tight">{common.signup}</Link>
+              New to ELN? <Link to="/signup" className="text-eln-primary font-black hover:underline tracking-tight">{common.signup}</Link>
             </p>
             <div className="pt-2">
               <Link 
                 to="/admin-login" 
-                className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] hover:text-eln transition-colors"
+                className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] hover:text-eln-primary transition-colors"
               >
                 Admin Login
               </Link>

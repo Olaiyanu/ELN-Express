@@ -154,7 +154,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
       >
         <div className="text-center space-y-10">
           <div className="bg-gray-50 p-12 rounded-5xl border border-gray-100 space-y-6">
-            <div className="bg-eln w-20 h-20 rounded-4xl flex items-center justify-center text-white mx-auto shadow-2xl shadow-eln/30">
+            <div className="bg-gradient-eln w-20 h-20 rounded-4xl flex items-center justify-center text-white mx-auto shadow-2xl shadow-eln-primary/30">
               <Mail className="h-10 w-10" />
             </div>
             <div className="space-y-2">
@@ -168,14 +168,14 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
           <div className="space-y-6">
             <button 
               onClick={confirmEmail}
-              className="w-full py-6 bg-eln text-white rounded-full font-black text-sm uppercase tracking-widest shadow-2xl shadow-eln/30 flex items-center justify-center space-x-3 active:scale-95 transition-all"
+              className="w-full py-6 bg-gradient-eln text-white rounded-full font-black text-sm uppercase tracking-widest shadow-2xl shadow-eln-primary/30 flex items-center justify-center space-x-3 active:scale-95 transition-all"
             >
               <span>Simulate Email Link Click</span>
               <ArrowRight className="h-5 w-5" />
             </button>
             <button 
               onClick={() => setIsEmailSent(false)}
-              className="text-xs font-black text-gray-400 uppercase tracking-widest hover:text-eln transition-colors"
+              className="text-xs font-black text-gray-400 uppercase tracking-widest hover:text-eln-primary transition-colors"
             >
               Back to Signup
             </button>
@@ -303,12 +303,12 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
                       Valid Identification (ID Card)
                     </label>
                     <div className="relative group">
-                      <FileText className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300 group-focus-within:text-eln transition-colors" />
+                      <FileText className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300 group-focus-within:text-eln-primary transition-colors" />
                       <div className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-2xl flex items-center justify-between">
                         <span className="text-sm font-bold text-gray-400 truncate">
                           {formData.idCardUrl ? 'ID Card Uploaded' : 'Upload Government ID'}
                         </span>
-                        <label className="cursor-pointer bg-white px-4 py-2 rounded-xl border border-gray-100 text-[10px] font-black uppercase tracking-widest hover:bg-eln hover:text-white transition-all">
+                        <label className="cursor-pointer bg-white px-4 py-2 rounded-xl border border-gray-100 text-[10px] font-black uppercase tracking-widest hover:bg-eln-primary hover:text-white transition-all">
                           Browse
                           <input 
                             type="file" 
@@ -399,10 +399,10 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
             >
               <Link 
                 to="/merchant-policy" 
-                className="group flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-eln transition-all"
+                className="group flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-eln-primary transition-all"
               >
                 <ShieldCheck className="h-3.5 w-3.5 group-hover:scale-110 transition-transform" />
-                <span className="border-b border-transparent group-hover:border-eln">View Merchant Policy</span>
+                <span className="border-b border-transparent group-hover:border-eln-primary">View Merchant Policy</span>
               </Link>
             </motion.div>
           )}
@@ -415,10 +415,10 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
             >
               <Link 
                 to="/rider-policy" 
-                className="group flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-eln transition-all"
+                className="group flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-eln-primary transition-all"
               >
                 <ShieldCheck className="h-3.5 w-3.5 group-hover:scale-110 transition-transform" />
-                <span className="border-b border-transparent group-hover:border-eln">View Rider Policy</span>
+                <span className="border-b border-transparent group-hover:border-eln-primary">View Rider Policy</span>
               </Link>
             </motion.div>
           )}
@@ -434,7 +434,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
                 id="terms"
                 checked={agreedToTerms}
                 onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="h-5 w-5 rounded-lg border-2 border-gray-200 text-eln focus:ring-eln transition-all cursor-pointer appearance-none checked:bg-eln checked:border-eln"
+                className="h-5 w-5 rounded-lg border-2 border-gray-200 text-eln-primary focus:ring-eln-primary transition-all cursor-pointer appearance-none checked:bg-eln-primary checked:border-eln-primary"
               />
               {agreedToTerms && (
                 <ShieldCheck className="absolute h-3 w-3 text-white left-1 pointer-events-none" />
@@ -452,7 +452,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
 
         <div className="text-center">
           <p className="text-sm text-gray-500 font-medium">
-            {t.hasAccount} <Link to="/login" className="text-eln font-black hover:underline tracking-tight">{t.loginInstead}</Link>
+            {t.hasAccount} <Link to="/login" className="text-eln-primary font-black hover:underline tracking-tight">{t.loginInstead}</Link>
           </p>
         </div>
       </div>

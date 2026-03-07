@@ -137,49 +137,41 @@ const LandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen selection:bg-eln/10">
-      {/* Enhanced Navigation */}
+    <div className="flex flex-col min-h-screen selection:bg-eln-primary/10">
+      {/* Enhanced Navigation - Floating Island Style */}
       <motion.nav 
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
-          isScrolled 
-            ? 'py-4' 
-            : 'py-8'
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 py-4 sm:py-6"
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           <div className={`flex justify-between items-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
             isScrolled 
-              ? 'bg-white/80 backdrop-blur-2xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] rounded-[2.5rem] px-8 h-16' 
-              : 'bg-transparent h-20'
+              ? 'bg-white/95 backdrop-blur-2xl border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-2xl px-6 sm:px-8 h-14' 
+              : 'bg-white border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.05)] rounded-[2rem] px-8 sm:px-10 h-16'
           }`}>
             <motion.div 
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.02 }}
               className="flex items-center space-x-3"
             >
               <Logo 
-                className={`transition-all duration-500 ${isScrolled ? 'h-6 scale-90' : 'h-7 scale-110'}`} 
+                className={`transition-all duration-500 ${isScrolled ? 'h-5 scale-90' : 'h-6 scale-100'}`} 
                 showText={true} 
-                variant={isScrolled ? 'default' : 'white'}
+                variant="primary"
               />
             </motion.div>
             
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center space-x-10">
+            <div className="hidden md:flex items-center space-x-6">
               <div className="relative">
                 <button 
                   onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
                   onBlur={() => setTimeout(() => setIsLangDropdownOpen(false), 200)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 text-[10px] font-black uppercase tracking-widest ${
-                    isScrolled 
-                      ? 'text-gray-500 hover:bg-gray-100' 
-                      : 'text-white/80 hover:bg-white/10'
-                  }`}
+                  className="flex items-center space-x-2 px-3 py-1.5 rounded-full transition-all duration-300 text-[9px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-100"
                 >
                   <span>{LANG_NAMES[lang]}</span>
-                  <ChevronDown className={`h-3 w-3 transition-transform duration-300 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-2.5 w-2.5 transition-transform duration-300 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
                 
                 <AnimatePresence>
@@ -194,7 +186,7 @@ const LandingPage: React.FC = () => {
                         <button
                           key={l}
                           onClick={() => { setLang(l); setIsLangDropdownOpen(false); }}
-                          className={`w-full text-left px-6 py-3.5 text-[10px] font-black uppercase tracking-widest transition-all ${lang === l ? 'text-eln bg-eln/5' : 'text-gray-500 hover:bg-gray-50'}`}
+                          className={`w-full text-left px-6 py-3.5 text-[10px] font-black uppercase tracking-widest transition-all ${lang === l ? 'text-eln-primary bg-eln-primary/5' : 'text-gray-500 hover:bg-gray-50'}`}
                         >
                           {LANG_NAMES[l]}
                         </button>
@@ -206,24 +198,18 @@ const LandingPage: React.FC = () => {
               
               <Link to="/login">
                 <motion.span 
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 inline-block ${
-                    isScrolled ? 'text-gray-500 hover:text-eln' : 'text-white/80 hover:text-white'
-                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="text-[9px] font-black uppercase tracking-widest transition-all duration-300 inline-block text-gray-500 hover:text-eln-primary"
                 >
                   {common.login}
                 </motion.span>
               </Link>
               <Link to="/signup">
                 <motion.div 
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 shadow-xl ${
-                    isScrolled 
-                      ? 'bg-eln text-white shadow-eln/20 hover:shadow-eln/30' 
-                      : 'bg-white text-gray-900 shadow-white/10 hover:shadow-white/20'
-                  }`}
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all duration-500 shadow-lg bg-eln-primary text-white shadow-eln-primary/10 hover:shadow-eln-primary/20"
                 >
                   {common.joinNow}
                 </motion.div>
@@ -231,44 +217,17 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="flex md:hidden items-center space-x-4">
-              <div className="relative">
-                <button 
-                  onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                  className={`flex items-center space-x-1 px-4 py-2 rounded-full text-[10px] font-black transition-all ${
-                    isScrolled ? 'bg-gray-100 text-gray-500' : 'bg-white/10 text-white'
-                  }`}
-                >
-                  <span>{lang.toUpperCase()}</span>
-                </button>
-                
-                <AnimatePresence>
-                  {isLangDropdownOpen && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full right-0 mt-4 w-36 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2.5 z-50"
-                    >
-                      {(Object.keys(LANG_NAMES) as Array<Language>).map((l) => (
-                        <button
-                          key={l}
-                          onClick={() => { setLang(l); setIsLangDropdownOpen(false); }}
-                          className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase tracking-widest ${lang === l ? 'text-eln' : 'text-gray-500'}`}
-                        >
-                          {LANG_NAMES[l]}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+            <div className="flex md:hidden items-center space-x-3">
+              <button 
+                onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                className="flex items-center space-x-1 px-3 py-2 rounded-full text-[10px] font-black bg-gray-100 text-gray-500"
+              >
+                <span>{lang.toUpperCase()}</span>
+              </button>
               
               <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`p-2.5 rounded-full transition-all ${
-                  isScrolled ? 'bg-gray-100 text-gray-900' : 'bg-white/10 text-white'
-                }`}
+                className="p-2.5 rounded-full transition-all bg-gray-100 text-gray-900"
               >
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
@@ -296,7 +255,7 @@ const LandingPage: React.FC = () => {
                 <Link 
                   to="/signup" 
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-center text-sm font-black uppercase tracking-widest text-white bg-eln py-5 rounded-2xl shadow-xl shadow-eln/20"
+                  className="block text-center text-sm font-black uppercase tracking-widest text-white bg-eln-primary py-5 rounded-2xl shadow-xl shadow-eln-primary/20"
                 >
                   {common.joinNow}
                 </Link>
@@ -307,99 +266,103 @@ const LandingPage: React.FC = () => {
       </motion.nav>
 
       {/* Hero Section: Immersive Background Slider */}
-      <header className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900">
+      <header className="relative min-h-screen flex items-center justify-center overflow-hidden bg-eln-orange-deep">
         {/* Background Image Slider */}
         <div className="absolute inset-0 z-0">
           <AnimatePresence initial={false}>
             <motion.div
               key={currentImageIndex}
-              initial={{ opacity: 0, scale: 1.1 }}
+              initial={{ opacity: 0, scale: 1.15 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
+              transition={{ duration: 2, ease: [0.4, 0, 0.2, 1] }}
               className="absolute inset-0"
             >
               <img 
                 src={HERO_IMAGES[currentImageIndex].url} 
                 alt={HERO_IMAGES[currentImageIndex].alt} 
-                className="w-full h-full object-cover grayscale-[0.3] brightness-[0.4]"
+                className="w-full h-full object-cover grayscale-[0.2] brightness-[0.25]"
                 referrerPolicy="no-referrer"
               />
             </motion.div>
           </AnimatePresence>
-          {/* Gradient Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-transparent to-gray-900 z-10"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/40 via-transparent to-gray-900/40 z-10"></div>
+          
+          {/* Advanced Gradient Overlays */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-eln-orange-deep z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-eln-orange-deep/30 via-transparent to-black/40 z-10"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-transparent to-black/60 z-10"></div>
+          
+          {/* Animated Mesh-like particles or noise could go here */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-20 text-center">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-20 text-center pt-32 sm:pt-40">
           <motion.div 
             key={lang}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white text-[10px] font-black uppercase tracking-widest mb-8"
+            className="inline-flex items-center space-x-3 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full text-white text-[9px] font-black uppercase tracking-[0.2em] mb-10 shadow-xl"
           >
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-eln-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-eln-primary"></span>
             </span>
-            <span>{t.badge}</span>
+            <span className="opacity-70">{t.badge}</span>
           </motion.div>
 
           <h1 
             key={`title-${lang}`}
-            className="text-4xl sm:text-7xl lg:text-9xl font-black text-white leading-[1] tracking-tighter mb-8 transform -skew-x-6"
+            className="text-5xl sm:text-7xl lg:text-9xl font-black text-white leading-[0.95] tracking-tighter mb-8 transform -skew-x-1"
           >
-            <div className="reveal-text">
-              <Typewriter text={t.heroTitle1} delay={500} speed={70} />
+            <div className="reveal-text overflow-hidden">
+              <Typewriter text={t.heroTitle1} delay={500} speed={60} />
             </div>
-            <br />
-            <div className="reveal-text text-white/80">
-              <Typewriter text={t.heroTitle2} delay={2000} speed={70} />
+            <div className="reveal-text text-eln-primary/90 mt-1">
+              <Typewriter text={t.heroTitle2} delay={1800} speed={60} />
             </div>
           </h1>
 
           <motion.p 
             key={`desc-${lang}`}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="text-base sm:text-2xl text-white/60 font-medium max-w-3xl mx-auto mb-12"
+            className="text-base sm:text-xl text-white/40 font-medium max-w-xl mx-auto mb-12 leading-relaxed"
           >
             {t.heroDesc}
           </motion.p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 3.5 }}
+              transition={{ delay: 3.2 }}
               className="w-full sm:w-auto"
             >
-              <Link to="/signup" className="w-full px-8 sm:px-10 py-5 bg-white text-gray-900 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-white/10 flex items-center justify-center space-x-3 hover:bg-gray-100 transition-all animate-glow border border-white/20">
+              <Link to="/signup" className="w-full px-8 py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-eln-primary/10 flex items-center justify-center space-x-2 hover:scale-[1.02] transition-all border border-white/10">
                 <span>{common.getStarted}</span>
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 3.7 }}
+              transition={{ delay: 3.4 }}
               className="w-full sm:w-auto"
             >
-              <Link to="/login" className="w-full px-8 sm:px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center hover:bg-white/20 transition-all">
-                Online Merchant Login
+              <Link to="/login" className="w-full px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center hover:bg-white/10 transition-all">
+                Merchant Login
               </Link>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 3.9 }}
+              transition={{ delay: 3.6 }}
               className="w-full sm:w-auto"
             >
-              <Link to="/login" className="w-full px-8 sm:px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center hover:bg-white/20 transition-all">
+              <Link to="/login" className="w-full px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center hover:bg-white/10 transition-all">
                 Rider Login
               </Link>
             </motion.div>
@@ -436,14 +399,14 @@ const LandingPage: React.FC = () => {
       </header>
 
       {/* MVP Features: Expanded Services */}
-      <section id="services" className="py-32 bg-white relative overflow-hidden">
+      <section id="services" className="py-32 bg-eln-bg relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
           <div className="text-center mb-20">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center space-x-2 px-4 py-1.5 bg-eln/5 rounded-full text-eln text-[10px] font-black uppercase tracking-widest mb-6"
+              className="inline-flex items-center space-x-2 px-4 py-1.5 bg-eln-primary/10 rounded-full text-eln-primary text-[10px] font-black uppercase tracking-widest mb-6"
             >
               <span>Our Capabilities</span>
             </motion.div>
@@ -451,7 +414,7 @@ const LandingPage: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-3xl sm:text-5xl lg:text-7xl font-black mb-8 tracking-tighter text-gray-900"
+              className="text-3xl sm:text-5xl lg:text-7xl font-black mb-8 tracking-tighter text-eln-orange-deep"
             >
               {t.servicesTitle}
             </motion.h2>
@@ -573,10 +536,10 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* About Brand Section */}
-      <section className="py-32 bg-gray-900 text-white relative overflow-hidden">
+      <section className="py-32 bg-eln-orange-deep text-white relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-eln rounded-full blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-eln rounded-full blur-[120px]" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-eln-primary rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-eln-primary rounded-full blur-[120px]" />
         </div>
         
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
@@ -625,7 +588,7 @@ const LandingPage: React.FC = () => {
                   animate: { duration: 5, repeat: Infinity, ease: "easeInOut" }
                 }}
                 viewport={{ once: true }}
-                className="rounded-[4rem] overflow-hidden aspect-square relative shadow-2xl shadow-eln/30 border border-white/10"
+                className="rounded-[4rem] overflow-hidden aspect-square relative shadow-2xl shadow-eln-primary/30 border border-white/10"
               >
                 <img 
                   src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?q=80&w=1000&auto=format&fit=crop" 
@@ -633,11 +596,11 @@ const LandingPage: React.FC = () => {
                   className="w-full h-full object-cover grayscale brightness-90 hover:grayscale-0 transition-all duration-1000 scale-110"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-eln/20 to-transparent mix-blend-overlay" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-eln-primary/20 to-transparent mix-blend-overlay" />
               </motion.div>
-              <div className="absolute -bottom-10 -left-10 bg-white p-8 rounded-[3rem] text-gray-900 shadow-2xl hidden md:block">
+              <div className="absolute -bottom-10 -left-10 bg-white p-8 rounded-[3rem] text-eln-orange-deep shadow-2xl hidden md:block">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-eln rounded-2xl flex items-center justify-center text-white">
+                  <div className="w-12 h-12 bg-eln-primary rounded-2xl flex items-center justify-center text-white">
                     <ShieldCheck className="h-6 w-6" />
                   </div>
                   <div>
@@ -652,19 +615,19 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-32 bg-white">
+      <section className="py-32 bg-gradient-eln-deep text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-24">
-            <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tighter mb-6">
+            <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tighter mb-6">
               {t.howItWorksTitle}
             </h2>
-            <p className="text-gray-500 font-medium text-lg">
+            <p className="text-white/80 font-medium text-lg">
               {t.howItWorksDesc}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-            <div className="absolute top-1/2 left-0 w-full h-px bg-gray-100 -translate-y-1/2 hidden md:block z-0" />
+            <div className="absolute top-1/2 left-0 w-full h-px bg-white/20 -translate-y-1/2 hidden md:block z-0" />
             
             {t.merchantSteps.map((step: any, i: number) => (
               <motion.div 
@@ -675,11 +638,11 @@ const LandingPage: React.FC = () => {
                 transition={{ delay: i * 0.2 }}
                 className="relative z-10 text-center space-y-6"
               >
-                <div className="w-20 h-20 bg-white border-4 border-gray-50 rounded-full flex items-center justify-center mx-auto shadow-xl text-eln font-black text-2xl">
+                <div className="w-20 h-20 bg-white border-4 border-white/10 rounded-full flex items-center justify-center mx-auto shadow-xl text-eln-primary font-black text-2xl">
                   0{i + 1}
                 </div>
-                <h3 className="text-xl font-black text-gray-900">{step.title}</h3>
-                <p className="text-gray-500 text-sm font-medium leading-relaxed px-4">{step.desc}</p>
+                <h3 className="text-xl font-black text-white">{step.title}</h3>
+                <p className="text-white/70 text-sm font-medium leading-relaxed px-4">{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -687,18 +650,18 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-32 bg-gray-50">
+      <section className="py-32 bg-eln-bg">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="flex flex-col lg:flex-row gap-20">
             <div className="lg:w-1/3 space-y-8">
-              <h2 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tighter leading-[0.9]">
+              <h2 className="text-4xl sm:text-5xl font-black text-eln-orange-deep tracking-tighter leading-[0.9]">
                 {t.whyChooseUsTitle}
               </h2>
               <p className="text-gray-500 font-medium">
                 {t.whyChooseUsDesc}
               </p>
               <div className="pt-4">
-                <Link to="/signup" className="inline-flex items-center space-x-3 text-eln font-black text-[10px] uppercase tracking-widest group">
+                <Link to="/signup" className="inline-flex items-center space-x-3 text-eln-primary font-black text-[10px] uppercase tracking-widest group">
                   <span>Start Shipping Now</span>
                   <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -707,16 +670,16 @@ const LandingPage: React.FC = () => {
             <div className="lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-8">
               {t.reasons.map((reason: any, i: number) => (
                 <div key={i} className="bg-white p-10 rounded-[3rem] shadow-sm border border-gray-100">
-                  <div className="w-12 h-12 bg-eln/5 rounded-2xl flex items-center justify-center text-eln mb-6">
+                  <div className="w-12 h-12 bg-eln-primary/10 rounded-2xl flex items-center justify-center text-eln-primary mb-6">
                     <CheckCircle2 className="h-6 w-6" />
                   </div>
-                  <h3 className="text-xl font-black text-gray-900 mb-3">{reason.title}</h3>
+                  <h3 className="text-xl font-black text-eln-orange-deep mb-3">{reason.title}</h3>
                   <p className="text-gray-500 text-sm font-medium leading-relaxed">{reason.desc}</p>
                 </div>
               ))}
-              <div className="bg-eln p-10 rounded-[3rem] text-white flex flex-col justify-between">
+              <div className="bg-eln-orange-deep p-10 rounded-[3rem] text-white flex flex-col justify-between">
                 <h3 className="text-2xl font-black leading-tight">Ready to experience the Elite difference?</h3>
-                <Link to="/signup" className="mt-8 py-4 bg-white text-gray-900 rounded-2xl font-black text-[10px] uppercase tracking-widest text-center hover:bg-gray-100 transition-all">
+                <Link to="/signup" className="mt-8 py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest text-center hover:bg-eln-primary/90 transition-all">
                   Get Started
                 </Link>
               </div>
@@ -726,9 +689,9 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Professional FAQ Section */}
-      <section id="faq" className="py-32 bg-white relative overflow-hidden">
+      <section id="faq" className="py-32 bg-eln-bg relative overflow-hidden">
         {/* Subtle background element */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gray-50/50 -skew-x-12 translate-x-1/4 z-0"></div>
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-white/50 -skew-x-12 translate-x-1/4 z-0"></div>
         
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
@@ -739,7 +702,7 @@ const LandingPage: React.FC = () => {
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  className="inline-flex items-center space-x-2 px-4 py-1.5 bg-gray-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest"
+                  className="inline-flex items-center space-x-2 px-4 py-1.5 bg-eln-orange-deep text-white rounded-full text-[10px] font-black uppercase tracking-widest"
                 >
                   <span>Knowledge Base</span>
                 </motion.div>
@@ -747,10 +710,10 @@ const LandingPage: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tighter leading-[0.9]"
+                  className="text-4xl sm:text-6xl font-black text-eln-orange-deep tracking-tighter leading-[0.9]"
                 >
                   Common <br/>
-                  <span className="text-eln">Questions.</span>
+                  <span className="text-eln-primary">Questions.</span>
                 </motion.h2>
                 <motion.p 
                   initial={{ opacity: 0, y: 20 }}
@@ -769,7 +732,7 @@ const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
-                className="bg-gray-900 p-10 rounded-[3rem] text-white space-y-8 shadow-2xl shadow-gray-900/20 relative overflow-hidden group"
+                className="bg-eln-orange-deep p-10 rounded-[3rem] text-white space-y-8 shadow-2xl shadow-eln-orange-deep/20 relative overflow-hidden group"
               >
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors"></div>
                 <div className="relative z-10 space-y-6">
@@ -780,7 +743,7 @@ const LandingPage: React.FC = () => {
                     <h3 className="text-2xl font-black tracking-tight">Still have questions?</h3>
                     <p className="text-white/60 text-sm font-medium leading-relaxed">Our concierge team is available 24/7 to assist with your specific logistics needs.</p>
                   </div>
-                  <Link to="/support" className="inline-flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-white hover:text-eln transition-colors group/btn">
+                  <Link to="/support" className="inline-flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-white hover:text-eln-primary transition-colors group/btn">
                     <span>Contact Support</span>
                     <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
                   </Link>
@@ -805,12 +768,12 @@ const LandingPage: React.FC = () => {
                   >
                     <div className="flex items-start space-x-6">
                       <span className="text-[10px] font-black text-gray-300 mt-1.5 font-mono">0{index + 1}</span>
-                      <span className={`font-black text-gray-900 text-lg sm:text-xl tracking-tight transition-colors ${openFaqIndex === index ? 'text-eln' : ''}`}>
+                      <span className={`font-black text-eln-orange-deep text-lg sm:text-xl tracking-tight transition-colors ${openFaqIndex === index ? 'text-eln-primary' : ''}`}>
                         {faq.question}
                       </span>
                     </div>
                     <div className={`mt-1.5 flex-shrink-0 transition-transform duration-500 ${openFaqIndex === index ? 'rotate-180' : ''}`}>
-                      <ChevronDown className={`h-5 w-5 ${openFaqIndex === index ? 'text-eln' : 'text-gray-300'}`} />
+                      <ChevronDown className={`h-5 w-5 ${openFaqIndex === index ? 'text-eln-primary' : 'text-gray-300'}`} />
                     </div>
                   </button>
                   
@@ -837,25 +800,25 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Simple CTA Section */}
-      <section className="py-24 bg-white text-center">
+      <section className="py-24 bg-eln-bg text-center">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           className="max-w-4xl mx-auto px-6"
         >
-          <h2 className="text-3xl sm:text-5xl font-black text-gray-900 mb-6">Ready to Scale your Business?</h2>
+          <h2 className="text-3xl sm:text-5xl font-black text-eln-orange-deep mb-6">Ready to Scale your Business?</h2>
           <p className="text-gray-500 font-medium text-lg mb-10">
             Join the network of merchants and riders redefining the order-to-doorstep experience.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
-              <Link to="/signup" className="block px-12 py-5 bg-eln text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-eln/30 transition-all">
+              <Link to="/signup" className="block px-12 py-5 bg-eln-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-eln-primary/30 transition-all">
                 Join as Merchant
               </Link>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
-              <Link to="/signup" className="block px-12 py-5 bg-gray-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
+              <Link to="/signup" className="block px-12 py-5 bg-eln-orange-deep text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
                 Become a Rider
               </Link>
             </motion.div>
@@ -864,12 +827,12 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="bg-gray-900 text-white pt-24 pb-12">
+      <footer className="bg-eln-orange-deep text-white pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
             <div className="space-y-8">
               <Logo className="h-8" showText={true} variant="white" />
-              <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
+              <p className="text-white/80 text-sm leading-relaxed max-w-xs">
                 The specialized delivery partner for fashion brands and small businesses. We handle your products with the care they deserve.
               </p>
               <div className="flex space-x-4">
@@ -878,7 +841,7 @@ const LandingPage: React.FC = () => {
                   { name: 'Instagram', icon: Instagram },
                   { name: 'LinkedIn', icon: Linkedin }
                 ].map(social => (
-                  <div key={social.name} className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-eln transition-colors cursor-pointer group">
+                  <div key={social.name} className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-eln-primary transition-colors cursor-pointer group">
                     <span className="sr-only">{social.name}</span>
                     <social.icon className="h-4 w-4 text-white/40 group-hover:text-white transition-colors" />
                   </div>
@@ -887,40 +850,40 @@ const LandingPage: React.FC = () => {
             </div>
 
             <div>
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-8">Platform</h4>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mb-8">Platform</h4>
               <ul className="space-y-4 text-sm font-bold">
-                <li><Link to="/signup" className="text-gray-400 hover:text-white transition-colors">{t.joinMerchant}</Link></li>
-                <li><Link to="/signup" className="text-gray-400 hover:text-white transition-colors">{t.becomeRider}</Link></li>
-                <li><Link to="/login" className="text-gray-400 hover:text-white transition-colors">{common.login}</Link></li>
-                <li><Link to="/admin-login" className="text-gray-400 hover:text-white transition-colors">{common.admin}</Link></li>
+                <li><Link to="/signup" className="text-white/80 hover:text-white transition-colors">{t.joinMerchant}</Link></li>
+                <li><Link to="/signup" className="text-white/80 hover:text-white transition-colors">{t.becomeRider}</Link></li>
+                <li><Link to="/login" className="text-white/80 hover:text-white transition-colors">{common.login}</Link></li>
+                <li><Link to="/admin-login" className="text-white/80 hover:text-white transition-colors">{common.admin}</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-8">Company</h4>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mb-8">Company</h4>
               <ul className="space-y-4 text-sm font-bold">
-                <li><Link to="/about" className="text-gray-400 hover:text-white transition-colors">{common.about}</Link></li>
-                <li><Link to="/support" className="text-gray-400 hover:text-white transition-colors">{common.support}</Link></li>
-                <li><Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">{common.privacy}</Link></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+                <li><Link to="/about" className="text-white/80 hover:text-white transition-colors">{common.about}</Link></li>
+                <li><Link to="/support" className="text-white/80 hover:text-white transition-colors">{common.support}</Link></li>
+                <li><Link to="/privacy" className="text-white/80 hover:text-white transition-colors">{common.privacy}</Link></li>
+                <li><a href="#" className="text-white/80 hover:text-white transition-colors">Careers</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-8">Contact</h4>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mb-8">Contact</h4>
               <ul className="space-y-4 text-sm font-bold">
-                <li className="text-gray-400">Victoria Island, Lagos</li>
-                <li className="text-gray-400">hello@elnexpress.com</li>
-                <li className="text-gray-400">+234 800-ELN-SUPPORT</li>
+                <li className="text-white/80">Victoria Island, Lagos</li>
+                <li className="text-white/80">hello@elnexpress.com</li>
+                <li className="text-white/80">+234 800-ELN-SUPPORT</li>
               </ul>
             </div>
           </div>
 
           <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-[10px] font-black uppercase text-gray-500 tracking-[0.3em]">
+            <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.3em]">
               &copy; {new Date().getFullYear()} ELN EXPRESS LIMITED. ALL RIGHTS RESERVED.
             </p>
-            <div className="flex space-x-8 text-[10px] font-black uppercase tracking-widest text-gray-500">
+            <div className="flex space-x-8 text-[10px] font-black uppercase tracking-widest text-white/40">
               <a href="#" className="hover:text-white transition-colors">Terms</a>
               <a href="#" className="hover:text-white transition-colors">Cookies</a>
             </div>

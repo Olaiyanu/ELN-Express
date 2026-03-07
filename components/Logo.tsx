@@ -12,7 +12,7 @@ const Logo: React.FC<LogoProps> = ({
   showText = true, 
   variant = 'primary' 
 }) => {
-  const color = variant === 'white' ? '#FFFFFF' : '#034287';
+  const color = variant === 'white' ? '#FFFFFF' : '#FF7A00';
   
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
@@ -26,7 +26,7 @@ const Logo: React.FC<LogoProps> = ({
           <rect x="10" y="10" width="80" height="80" rx="24" fill={color} />
           <path 
             d="M30 50L45 65L70 35" 
-            stroke="white" 
+            stroke={variant === 'white' ? '#FF7A00' : 'white'} 
             strokeWidth="12" 
             strokeLinecap="round" 
             strokeLinejoin="round" 
@@ -36,8 +36,8 @@ const Logo: React.FC<LogoProps> = ({
       
       {showText && (
         <div className="flex flex-col leading-none">
-          <span className={`text-xl font-black tracking-tight ${variant === 'white' ? 'text-white' : 'text-gray-900'}`}>
-            ELN<span className="text-eln">Express</span>
+          <span className={`text-xl font-black tracking-tight ${variant === 'white' ? 'text-white' : 'text-eln-text'}`}>
+            ELN<span className="text-eln-primary">Express</span>
           </span>
           <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${variant === 'white' ? 'text-white/60' : 'text-gray-400'}`}>
             Logistics

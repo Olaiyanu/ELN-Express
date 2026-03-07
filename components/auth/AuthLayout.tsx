@@ -29,7 +29,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         {/* Back Link */}
         <Link 
           to={backLink} 
-          className="inline-flex items-center text-gray-900 hover:text-eln transition-all group font-bold text-sm"
+          className="inline-flex items-center text-gray-900 hover:text-eln-primary transition-all group font-bold text-sm"
         >
           <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           <span>{backText}</span>

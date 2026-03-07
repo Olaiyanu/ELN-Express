@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Order } from '../types';
-import { Package, Check, X, MapPin } from 'lucide-react';
+import { Package, Check, X, MapPin, Navigation } from 'lucide-react';
 
 // Fix Leaflet marker icon issue
 // @ts-ignore
@@ -34,9 +34,30 @@ const requestIcon = new L.Icon({
     shadowSize: [41, 41]
 });
 
+// Custom icon for pickup
+const pickupIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
+// Custom icon for dropoff
+const dropoffIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
 interface RiderMapProps {
   riderLocation: { lat: number; lng: number } | null;
   nearbyRequests: Order[];
+  activeOrder?: Order | null;
   onAccept: (orderId: string) => void;
   onDecline: (orderId: string) => void;
 }
@@ -51,8 +72,16 @@ const RecenterMap = ({ location }: { location: { lat: number; lng: number } | nu
   return null;
 };
 
-const RiderMap: React.FC<RiderMapProps> = ({ riderLocation, nearbyRequests, onAccept, onDecline }) => {
+const RiderMap: React.FC<RiderMapProps> = ({ riderLocation, nearbyRequests, activeOrder, onAccept, onDecline }) => {
   const defaultCenter: [number, number] = [6.5244, 3.3792]; // Lagos
+
+  // Calculate coordinates for active order if present
+  const activePickupCoord: [number, number] | null = activeOrder ? 
+    [activeOrder.lat || 6.5244, activeOrder.lng || 3.3792] : null;
+  
+  // Mock dropoff location slightly offset from pickup
+  const activeDropoffCoord: [number, number] | null = activeOrder ? 
+    [(activeOrder.lat || 6.5244) + 0.02, (activeOrder.lng || 3.3792) + 0.02] : null;
 
   return (
     <div className="h-full w-full rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-xl relative z-0">
@@ -77,7 +106,38 @@ const RiderMap: React.FC<RiderMapProps> = ({ riderLocation, nearbyRequests, onAc
           </Marker>
         )}
 
-        {nearbyRequests.map((req) => {
+        {/* Active Order Route */}
+        {activeOrder && activePickupCoord && activeDropoffCoord && (
+          <>
+            <Marker position={activePickupCoord} icon={pickupIcon}>
+              <Popup>
+                <div className="p-2 space-y-1">
+                  <p className="text-[8px] font-black text-green-600 uppercase tracking-widest">Pickup Point</p>
+                  <p className="font-bold text-gray-800 text-xs">{activeOrder.merchantName}</p>
+                  <p className="text-[9px] text-gray-500">{activeOrder.pickupAddress}</p>
+                </div>
+              </Popup>
+            </Marker>
+            <Marker position={activeDropoffCoord} icon={dropoffIcon}>
+              <Popup>
+                <div className="p-2 space-y-1">
+                  <p className="text-[8px] font-black text-red-600 uppercase tracking-widest">Dropoff Point</p>
+                  <p className="font-bold text-gray-800 text-xs">{activeOrder.customerName}</p>
+                  <p className="text-[9px] text-gray-500">{activeOrder.deliveryAddress}</p>
+                </div>
+              </Popup>
+            </Marker>
+            <Polyline 
+              positions={[activePickupCoord, activeDropoffCoord]} 
+              color="#FF7A00" 
+              weight={4} 
+              dashArray="10, 10"
+              opacity={0.6}
+            />
+          </>
+        )}
+
+        {nearbyRequests.filter(req => req.id !== activeOrder?.id).map((req) => {
           const lat = req.lat || 6.5244 + (Math.random() - 0.5) * 0.05;
           const lng = req.lng || 3.3792 + (Math.random() - 0.5) * 0.05;
 
@@ -136,6 +196,18 @@ const RiderMap: React.FC<RiderMapProps> = ({ riderLocation, nearbyRequests, onAc
           <div className="h-3 w-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50"></div>
           <span className="text-[10px] font-black uppercase tracking-widest text-gray-600">You</span>
         </div>
+        {activeOrder && (
+          <>
+            <div className="flex items-center space-x-3">
+              <div className="h-3 w-3 rounded-full bg-green-500 shadow-sm shadow-green-500/50"></div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-600">Pickup</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="h-3 w-3 rounded-full bg-red-500 shadow-sm shadow-red-500/50"></div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-600">Dropoff</span>
+            </div>
+          </>
+        )}
         <div className="flex items-center space-x-3">
           <div className="h-3 w-3 rounded-full bg-orange-500 shadow-sm shadow-orange-500/50"></div>
           <span className="text-[10px] font-black uppercase tracking-widest text-gray-600">Pending Requests</span>

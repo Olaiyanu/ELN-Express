@@ -63,7 +63,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
     {
       title: t.welcome,
       description: t.welcomeDesc,
-      icon: <Sparkles className="h-12 w-12 text-eln" />,
+      icon: <Sparkles className="h-12 w-12 text-eln-primary" />,
       content: (
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
@@ -77,14 +77,14 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
-            <div className="absolute inset-0 bg-eln/20 backdrop-blur-[2px] flex items-center justify-center">
+            <div className="absolute inset-0 bg-eln-orange-deep/20 backdrop-blur-[2px] flex items-center justify-center">
               <motion.div 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
                 className="bg-white/90 p-4 rounded-2xl shadow-xl"
               >
-                <p className="text-[10px] font-black uppercase tracking-widest text-eln">Professional Service</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-eln-orange-deep">Professional Service</p>
               </motion.div>
             </div>
           </div>
@@ -97,7 +97,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
     {
       title: t.identity,
       description: t.identityDesc,
-      icon: <Store className="h-12 w-12 text-eln" />,
+      icon: <Store className="h-12 w-12 text-eln-primary" />,
       content: (
         <motion.div 
           initial="hidden"
@@ -114,8 +114,8 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
           className="space-y-8"
         >
           <motion.div variants={{ hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } }} className="flex flex-col items-center space-y-4">
-            <div className="h-32 w-32 rounded-full bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center space-y-2 group hover:border-eln hover:bg-eln/5 transition-all cursor-pointer">
-              <Camera className="h-6 w-6 text-gray-300 group-hover:text-eln" />
+            <div className="h-32 w-32 rounded-full bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center space-y-2 group hover:border-eln-primary hover:bg-eln-primary/5 transition-all cursor-pointer">
+              <Camera className="h-6 w-6 text-gray-300 group-hover:text-eln-primary" />
               <span className="text-[10px] font-black uppercase text-gray-400">{t.uploadLogo}</span>
             </div>
             <p className="text-xs text-gray-400 font-medium italic">This will appear on your digital waybills.</p>
@@ -163,18 +163,18 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
         >
           <div className="grid grid-cols-2 gap-4">
             <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }} className="bg-gray-50 p-6 rounded-3xl border border-gray-100 space-y-2">
-              <Package className="h-6 w-6 text-eln" />
+              <Package className="h-6 w-6 text-eln-primary" />
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Step 1</p>
               <p className="text-sm font-bold text-gray-800">Create Order</p>
             </motion.div>
             <motion.div variants={{ hidden: { opacity: 0, x: 20 }, visible: { opacity: 1, x: 0 } }} className="bg-gray-50 p-6 rounded-3xl border border-gray-100 space-y-2">
-              <MapPin className="h-6 w-6 text-eln" />
+              <MapPin className="h-6 w-6 text-eln-primary" />
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Step 2</p>
               <p className="text-sm font-bold text-gray-800">Track Rider</p>
             </motion.div>
           </div>
-          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="bg-eln/5 p-6 rounded-3xl border border-eln/10">
-            <p className="text-xs font-medium text-eln leading-relaxed">
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="bg-gradient-eln-deep p-6 rounded-3xl border border-eln-orange-deep/10 shadow-lg shadow-eln-orange-deep/20">
+            <p className="text-xs font-medium text-white leading-relaxed">
               {t.proTip}
             </p>
           </motion.div>
@@ -187,7 +187,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
     {
       title: t.elite,
       description: t.eliteDesc,
-      icon: <Bike className="h-12 w-12 text-eln" />,
+      icon: <Bike className="h-12 w-12 text-eln-primary" />,
       content: (
         <div className="space-y-6">
           <div className="aspect-video rounded-3xl overflow-hidden bg-gray-100 relative group">
@@ -197,9 +197,9 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
-            <div className="absolute inset-0 bg-eln/20 backdrop-blur-[2px] flex items-center justify-center">
+            <div className="absolute inset-0 bg-eln-orange-deep/20 backdrop-blur-[2px] flex items-center justify-center">
               <div className="bg-white/90 p-4 rounded-2xl shadow-xl">
-                <p className="text-[10px] font-black uppercase tracking-widest text-eln">Elite Fleet</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-eln-orange-deep">Elite Fleet</p>
               </div>
             </div>
           </div>
@@ -212,7 +212,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
     {
       title: t.safety,
       description: t.safetyDesc,
-      icon: <ShieldCheck className="h-12 w-12 text-eln" />,
+      icon: <ShieldCheck className="h-12 w-12 text-eln-primary" />,
       content: (
         <div className="space-y-4">
           {[
@@ -222,7 +222,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
             "Maintain a professional appearance at all times."
           ].map((item, i) => (
             <div key={i} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-              <div className="h-6 w-6 rounded-full bg-eln/10 flex items-center justify-center text-eln text-[10px] font-black">
+              <div className="h-6 w-6 rounded-full bg-eln-primary/10 flex items-center justify-center text-eln-primary text-[10px] font-black">
                 {i + 1}
               </div>
               <p className="text-sm font-bold text-gray-700">{item}</p>
@@ -234,7 +234,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
     {
       title: t.verification,
       description: t.verificationDesc,
-      icon: <ShieldCheck className="h-12 w-12 text-eln" />,
+      icon: <ShieldCheck className="h-12 w-12 text-eln-primary" />,
       content: (
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-4">
@@ -246,7 +246,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
                   className="absolute inset-0 opacity-0 cursor-pointer z-10" 
                   onChange={(e) => setVerificationData({...verificationData, idCardUrl: e.target.value})}
                 />
-                <div className="w-full p-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-between group-hover:border-eln group-hover:bg-eln/5 transition-all">
+                <div className="w-full p-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-between group-hover:border-eln-primary group-hover:bg-eln-primary/5 transition-all">
                   <div className="flex items-center space-x-3">
                     <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
                       <FileText className="h-5 w-5 text-gray-400" />
@@ -268,7 +268,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
                   className="absolute inset-0 opacity-0 cursor-pointer z-10" 
                   onChange={(e) => setVerificationData({...verificationData, selfieUrl: e.target.value})}
                 />
-                <div className="w-full p-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-between group-hover:border-eln group-hover:bg-eln/5 transition-all">
+                <div className="w-full p-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-between group-hover:border-eln-primary group-hover:bg-eln-primary/5 transition-all">
                   <div className="flex items-center space-x-3">
                     <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
                       <Camera className="h-5 w-5 text-gray-400" />
@@ -289,7 +289,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
                 placeholder="e.g. LAG-123-ABC"
                 value={verificationData.plateNumber}
                 onChange={(e) => setVerificationData({...verificationData, plateNumber: e.target.value})}
-                className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-gray-900 focus:ring-2 focus:ring-eln focus:bg-white transition-all"
+                className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-gray-900 focus:ring-2 focus:ring-eln-primary focus:bg-white transition-all"
               />
             </div>
           </div>
@@ -314,7 +314,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
           {steps.map((_, i) => (
             <div 
               key={i} 
-              className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${i <= step ? 'bg-eln' : 'bg-gray-200'}`} 
+              className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${i <= step ? 'bg-eln-primary' : 'bg-gray-200'}`} 
             />
           ))}
         </div>
@@ -324,10 +324,10 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="bg-white rounded-[3rem] shadow-2xl shadow-eln/5 p-8 sm:p-16 border border-gray-100"
+          className="bg-white rounded-[3rem] shadow-2xl shadow-eln-primary/5 p-8 sm:p-16 border border-gray-100"
         >
           <div className="flex flex-col items-center text-center space-y-8">
-            <div className="bg-eln/5 p-6 rounded-[2rem]">
+            <div className="bg-eln-primary/5 p-6 rounded-[2rem]">
               {currentStep.icon}
             </div>
             
@@ -347,7 +347,7 @@ const OnboardingPage: React.FC<OnboardingPageProps> = ({ user }) => {
             <button 
               onClick={() => step < steps.length - 1 ? setStep(step + 1) : handleComplete()}
               disabled={isSubmitting}
-              className="w-full py-5 bg-eln text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-eln/20 flex items-center justify-center space-x-3 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-5 bg-gradient-eln text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-3 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <Loader2 className="h-5 w-5 animate-spin" />

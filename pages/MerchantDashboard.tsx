@@ -245,7 +245,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
   );
 
   return (
-    <div className="min-h-screen flex bg-gray-50 overflow-hidden">
+    <div className="min-h-screen flex bg-eln-bg overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
@@ -253,39 +253,39 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-eln/40 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-eln-orange-deep/40 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
       </AnimatePresence>
 
       {/* Mobile Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 w-72 bg-eln z-50 transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 left-0 w-72 bg-eln-orange-deep z-50 transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <SidebarContent />
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className="w-72 bg-eln flex flex-col hidden lg:flex h-screen sticky top-0">
+      <aside className="w-72 bg-eln-orange-deep flex flex-col hidden lg:flex h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
       <main className="flex-1 flex flex-col h-screen overflow-y-auto w-full">
-        <header className="bg-white px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-30 border-b border-gray-100">
+        <header className="bg-eln-bg px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-30 border-b border-gray-100">
           <div className="flex items-center space-x-4">
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-400 lg:hidden hover:bg-gray-50 rounded-xl transition-colors">
               <Menu className="h-6 w-6" />
             </button>
             <h1 className="font-black text-xs uppercase tracking-[0.2em] text-gray-400">
-              Merchant Hub <span className="text-gray-200 mx-2">/</span> <span className="text-gray-900">{activeTab}</span>
+              Merchant Hub <span className="text-gray-200 mx-2">/</span> <span className="text-eln-orange-deep">{activeTab}</span>
             </h1>
           </div>
           <div className="flex items-center space-x-4">
              <NotificationBell userId={user.uid} />
              <button 
                onClick={() => setShowProfileModal(true)}
-               className="h-10 w-10 rounded-xl bg-gray-50 overflow-hidden border border-gray-100 hover:ring-2 hover:ring-eln transition-all"
+               className="h-10 w-10 rounded-xl bg-gray-50 overflow-hidden border border-gray-100 hover:ring-2 hover:ring-eln-primary transition-all"
              >
-                <img src={user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=034287&color=fff`} alt="" className="h-full w-full object-cover" />
+                <img src={user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=FF7A00&color=fff`} alt="" className="h-full w-full object-cover" />
              </button>
           </div>
         </header>
@@ -295,12 +295,12 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div className="space-y-1">
-                  <h2 className="text-3xl font-black text-gray-900 tracking-tight">Delivery Request</h2>
+                  <h2 className="text-3xl font-black text-eln-orange-deep tracking-tight">Delivery Request</h2>
                   <p className="text-sm text-gray-500 font-medium">Create a new high-priority fashion delivery mission.</p>
                 </div>
                 <button 
                   onClick={() => setShowCreateModal(true)}
-                  className="px-8 py-4 bg-eln text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln/20 hover:scale-105 transition-all"
+                  className="px-8 py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 hover:scale-105 transition-all"
                 >
                   Start New Request
                 </button>
@@ -308,30 +308,30 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6">
-                  <div className="bg-eln/5 w-12 h-12 rounded-2xl flex items-center justify-center text-eln">
+                  <div className="bg-eln-primary/5 w-12 h-12 rounded-2xl flex items-center justify-center text-eln-primary">
                     <Package className="h-6 w-6" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-xl font-black text-gray-900">Professional Dispatch</h3>
+                    <h3 className="text-xl font-black text-eln-orange-deep">Professional Dispatch</h3>
                     <p className="text-sm text-gray-500 leading-relaxed">Our elite fleet of riders is ready to handle your luxury fashion items with the utmost care and speed.</p>
                   </div>
                   <ul className="space-y-3">
                     {['Real-time tracking', 'Professional riders', 'Secure handling', 'Instant confirmation'].map((item, i) => (
                       <li key={i} className="flex items-center space-x-3 text-xs font-bold text-gray-600">
-                        <CheckCircle2 className="h-4 w-4 text-eln" />
+                        <CheckCircle2 className="h-4 w-4 text-eln-primary" />
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="bg-gray-900 p-8 rounded-[2.5rem] text-white space-y-6 relative overflow-hidden">
+                <div className="bg-gradient-eln-deep p-8 rounded-[2.5rem] text-white space-y-6 relative overflow-hidden shadow-2xl shadow-eln-orange-deep/20">
                   <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
                   <div className="relative z-10 space-y-6">
                     <h3 className="text-xl font-black">Quick Estimate</h3>
                     <p className="text-white/60 text-sm">Need to know the cost before you book? Use our professional estimator.</p>
                     <button 
                       onClick={() => setActiveTab('estimate')}
-                      className="w-full py-4 bg-white text-gray-900 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all"
+                      className="w-full py-4 bg-white text-eln-orange-deep rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all"
                     >
                       Check Prices
                     </button>
@@ -342,33 +342,33 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
           ) : activeTab === 'history' ? (
             <div className="space-y-8 animate-in fade-in duration-500">
               <div className="space-y-1">
-                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Tracking & History</h2>
+                <h2 className="text-3xl font-black text-eln-orange-deep tracking-tight">Tracking & History</h2>
                 <p className="text-sm text-gray-500 font-medium">Monitor your active deliveries and review past missions.</p>
               </div>
 
               <div className="space-y-4">
                 {orders.length > 0 ? (
                   orders.map(order => (
-                    <div key={order.id} className="bg-white p-6 sm:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-6 group transition-all hover:border-eln/20">
+                    <div key={order.id} className="bg-white p-6 sm:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-6 group transition-all hover:border-eln-primary/20">
                       <div className="flex items-start sm:items-center space-x-6 flex-1 min-w-0">
-                        <div className={`p-5 rounded-3xl flex-shrink-0 ${order.status === OrderStatus.DELIVERED ? 'bg-emerald-50 text-emerald-600' : 'bg-eln/5 text-eln'}`}>
+                        <div className={`p-5 rounded-3xl flex-shrink-0 ${order.status === OrderStatus.DELIVERED ? 'bg-emerald-50 text-emerald-600' : 'bg-eln-primary/5 text-eln-primary'}`}>
                           <Package className="h-7 w-7" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <span className="text-[10px] font-black text-eln uppercase tracking-widest bg-eln/5 px-2 py-0.5 rounded-lg">#{order.id.slice(0, 8)}</span>
-                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${order.status === OrderStatus.DELIVERED ? 'bg-emerald-100 text-emerald-600' : 'bg-eln/10 text-eln'}`}>
+                            <span className="text-[10px] font-black text-eln-primary uppercase tracking-widest bg-eln-primary/5 px-2 py-0.5 rounded-lg">#{order.id.slice(0, 8)}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${order.status === OrderStatus.DELIVERED ? 'bg-emerald-100 text-emerald-600' : 'bg-eln-primary/10 text-eln-primary'}`}>
                               {order.status}
                             </span>
                           </div>
-                          <h3 className="text-xl font-black text-gray-900 truncate">{order.customerName}</h3>
+                          <h3 className="text-xl font-black text-eln-orange-deep truncate">{order.customerName}</h3>
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 mt-2">
                             <p className="text-xs text-gray-400 font-medium flex items-center">
-                              <MapPin className="h-3.5 w-3.5 mr-1.5 text-eln/30" />
+                              <MapPin className="h-3.5 w-3.5 mr-1.5 text-eln-primary/30" />
                               <span className="truncate">{order.deliveryAddress}</span>
                             </p>
                             {order.riderName && (
-                              <button onClick={() => order.riderId && handleViewRiderProfile(order.riderId)} className="text-xs font-black text-eln hover:underline flex items-center">
+                              <button onClick={() => order.riderId && handleViewRiderProfile(order.riderId)} className="text-xs font-black text-eln-primary hover:underline flex items-center">
                                 <Bike className="h-3.5 w-3.5 mr-1.5" />
                                 {order.riderName}
                               </button>
@@ -378,7 +378,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                       </div>
                       <div className="flex items-center space-x-4">
                          <div className="text-right">
-                            <p className="text-sm font-black text-gray-900">₦{order.deliveryFee?.toLocaleString()}</p>
+                            <p className="text-sm font-black text-eln-orange-deep">₦{order.deliveryFee?.toLocaleString()}</p>
                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</p>
                          </div>
                       </div>
@@ -419,7 +419,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                         placeholder="Enter destination address..."
                         value={estimateData.dropoff}
                         onChange={e => setEstimateData({...estimateData, dropoff: e.target.value})}
-                        className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                        className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" 
                       />
                     </div>
                     <div className="space-y-2">
@@ -427,13 +427,13 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                       <select 
                         value={estimateData.weight}
                         onChange={e => setEstimateData({...estimateData, weight: e.target.value})}
-                        className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900"
+                        className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900"
                       >
                         <option>Standard</option>
                         <option>Heavy</option>
                       </select>
                     </div>
-                    <button type="submit" className="w-full py-5 bg-eln text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    <button type="submit" className="w-full py-5 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
                       Calculate Quote
                     </button>
                   </form>
@@ -444,7 +444,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                     <motion.div 
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="bg-eln text-white p-12 rounded-[3rem] text-center space-y-6 shadow-2xl shadow-eln/30"
+                      className="bg-gradient-eln-deep text-white p-12 rounded-[3rem] text-center space-y-6 shadow-2xl shadow-eln-orange-deep/30"
                     >
                       <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Estimated Delivery Fee</p>
                       <p className="text-6xl font-black">₦{calculatedPrice.toLocaleString()}</p>
@@ -452,7 +452,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                       <p className="text-xs text-white/60 leading-relaxed">This is a professional estimate based on current traffic and distance. Final price may vary slightly.</p>
                       <button 
                         onClick={() => { setActiveTab('request'); setShowCreateModal(true); }}
-                        className="w-full py-4 bg-white text-eln rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all"
+                        className="w-full py-4 bg-white text-eln-orange-deep rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all"
                       >
                         Book Now
                       </button>
@@ -473,7 +473,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
       {/* New Request Modal */}
       <AnimatePresence>
         {showCreateModal && (
-          <div className="fixed inset-0 bg-eln/60 backdrop-blur-lg z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="fixed inset-0 bg-eln-orange-deep/60 backdrop-blur-lg z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <motion.div 
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
@@ -481,7 +481,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
               className="bg-white w-full max-w-xl rounded-t-[2.5rem] sm:rounded-[3rem] shadow-2xl p-6 sm:p-12 space-y-8 overflow-y-auto max-h-[95vh]"
             >
               <div className="flex justify-between items-center">
-                <h3 className="text-2xl font-black text-gray-900">New Request</h3>
+                <h3 className="text-2xl font-black text-eln-orange-deep">New Request</h3>
                 <button onClick={() => setShowCreateModal(false)} className="p-3 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
                   <X className="h-6 w-6" />
                 </button>
@@ -492,14 +492,14 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                       <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Customer Name</label>
                       <div className="relative">
                          <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
-                         <input required type="text" value={newOrder.customerName} onChange={e => setNewOrder({...newOrder, customerName: e.target.value})} placeholder="e.g. Linda Evangelista" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" />
+                         <input required type="text" value={newOrder.customerName} onChange={e => setNewOrder({...newOrder, customerName: e.target.value})} placeholder="e.g. Linda Evangelista" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
                       </div>
                     </div>
                     <div className="space-y-1">
                       <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Phone</label>
                       <div className="relative">
                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
-                         <input required type="tel" value={newOrder.customerPhone} onChange={e => setNewOrder({...newOrder, customerPhone: e.target.value})} placeholder="+234 800 000 0000" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" />
+                         <input required type="tel" value={newOrder.customerPhone} onChange={e => setNewOrder({...newOrder, customerPhone: e.target.value})} placeholder="+234 800 000 0000" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
                       </div>
                     </div>
                  </div>
@@ -508,7 +508,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Customer Email</label>
                     <div className="relative">
                        <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
-                       <input required type="email" value={newOrder.customerEmail} onChange={e => setNewOrder({...newOrder, customerEmail: e.target.value})} placeholder="customer@example.com" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" />
+                       <input required type="email" value={newOrder.customerEmail} onChange={e => setNewOrder({...newOrder, customerEmail: e.target.value})} placeholder="customer@example.com" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
                     </div>
                  </div>
                  
@@ -519,7 +519,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                     </div>
                     <div className="relative">
                        <MapPin className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 ${isVerified ? 'text-green-500' : 'text-gray-300'}`} />
-                       <input required type="text" value={newOrder.deliveryAddress} onChange={e => handleAddressChange(e.target.value)} placeholder="Building or street..." className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" />
+                       <input required type="text" value={newOrder.deliveryAddress} onChange={e => handleAddressChange(e.target.value)} placeholder="Building or street..." className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
                     </div>
                     {showSuggestions && suggestions.length > 0 && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[70]">
@@ -532,9 +532,9 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
 
                  <div className="space-y-1">
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Package Description</label>
-                    <textarea value={newOrder.itemsDescription} onChange={e => setNewOrder({...newOrder, itemsDescription: e.target.value})} placeholder="e.g. 2 Evening Gowns" className="w-full p-5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln h-24 font-bold text-gray-900 resize-none"></textarea>
+                    <textarea value={newOrder.itemsDescription} onChange={e => setNewOrder({...newOrder, itemsDescription: e.target.value})} placeholder="e.g. 2 Evening Gowns" className="w-full p-5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary h-24 font-bold text-gray-900 resize-none"></textarea>
                  </div>
-                 <button type="submit" className="w-full py-5 bg-eln text-white font-black rounded-2xl shadow-2xl shadow-eln/40 uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all">
+                 <button type="submit" className="w-full py-5 bg-eln-primary text-white font-black rounded-2xl shadow-2xl shadow-eln-primary/40 uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all">
                    Request Dispatch
                  </button>
               </form>
@@ -547,15 +547,15 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
       <AnimatePresence>
         {selectedRider && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedRider(null)} className="absolute inset-0 bg-eln/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedRider(null)} className="absolute inset-0 bg-eln-orange-deep/40 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden relative z-10 p-12 text-center">
               <div className="inline-block p-2 bg-white rounded-[2.5rem] shadow-xl mb-6">
                 <div className="h-28 w-28 rounded-[2rem] overflow-hidden bg-gray-100">
-                  <img src={selectedRider.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedRider.name)}&background=034287&color=fff`} alt="" className="h-full w-full object-cover" />
+                  <img src={selectedRider.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedRider.name)}&background=FF7A00&color=fff`} alt="" className="h-full w-full object-cover" />
                 </div>
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-1">{selectedRider.name}</h3>
-              <p className="text-[10px] font-black uppercase tracking-widest text-eln mb-8">Elite Fleet Rider</p>
+              <h3 className="text-2xl font-black text-eln-orange-deep mb-1">{selectedRider.name}</h3>
+              <p className="text-[10px] font-black uppercase tracking-widest text-eln-primary mb-8">Elite Fleet Rider</p>
               <div className="grid grid-cols-2 gap-4 mb-8">
                 <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100">
                   <p className="text-[8px] font-black uppercase text-gray-400 tracking-widest mb-1">Vehicle No.</p>
@@ -569,7 +569,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                   </div>
                 </div>
               </div>
-              <a href={`tel:${selectedRider.phone}`} className="w-full py-4 bg-eln text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln/20 flex items-center justify-center space-x-3 hover:scale-[1.02] transition-all">
+              <a href={`tel:${selectedRider.phone}`} className="w-full py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-3 hover:scale-[1.02] transition-all">
                 <Phone className="h-4 w-4" />
                 <span>Call Rider</span>
               </a>
@@ -581,7 +581,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
       {/* Profile Edit Modal */}
       <AnimatePresence>
         {showProfileModal && (
-          <div className="fixed inset-0 bg-eln/60 backdrop-blur-lg z-[120] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-eln-orange-deep/60 backdrop-blur-lg z-[120] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -589,7 +589,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
               className="bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-8 sm:p-12 space-y-8"
             >
               <div className="flex justify-between items-center">
-                <h3 className="text-2xl font-black text-gray-900">Edit Profile</h3>
+                <h3 className="text-2xl font-black text-eln-orange-deep">Edit Profile</h3>
                 <button onClick={() => setShowProfileModal(false)} className="p-3 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
                   <X className="h-6 w-6" />
                 </button>
@@ -600,7 +600,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                   <div className="relative group">
                     <div className="h-24 w-24 rounded-[2rem] overflow-hidden bg-gray-100 border-2 border-gray-100">
                       <img 
-                        src={profileForm.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=034287&color=fff`} 
+                        src={profileForm.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=FF7A00&color=fff`} 
                         alt="" 
                         className="h-full w-full object-cover" 
                       />
@@ -621,7 +621,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                       type="text" 
                       value={profileForm.name} 
                       onChange={e => setProfileForm({...profileForm, name: e.target.value})} 
-                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" 
                     />
                   </div>
                   <div className="space-y-1">
@@ -631,7 +631,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                       type="text" 
                       value={profileForm.businessName} 
                       onChange={e => setProfileForm({...profileForm, businessName: e.target.value})} 
-                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" 
                     />
                   </div>
                   <div className="space-y-1">
@@ -641,7 +641,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                       type="tel" 
                       value={profileForm.phone} 
                       onChange={e => setProfileForm({...profileForm, phone: e.target.value})} 
-                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" 
                     />
                   </div>
                 </div>
@@ -649,7 +649,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                 <button 
                   type="submit" 
                   disabled={isSavingProfile}
-                  className="w-full py-5 bg-eln text-white font-black rounded-2xl shadow-2xl shadow-eln/40 uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                  className="w-full py-5 bg-eln-primary text-white font-black rounded-2xl shadow-2xl shadow-eln-primary/40 uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                 >
                   {isSavingProfile ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : 'Save Changes'}
                 </button>

@@ -85,8 +85,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }) => {
         onClick={() => setIsMobileMenuOpen(false)}
         className={`flex items-center justify-between px-5 py-4 rounded-full transition-all duration-300 ${
           isActive 
-            ? 'bg-eln text-white shadow-xl shadow-eln/20' 
-            : 'text-gray-500 hover:text-eln hover:bg-eln/5'
+            ? 'bg-eln-primary text-white shadow-xl shadow-eln-primary/20' 
+            : 'text-gray-500 hover:text-eln-primary hover:bg-eln-primary/5'
         }`}
       >
         <div className="flex items-center space-x-4">
@@ -94,7 +94,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }) => {
           <span className="font-bold text-sm tracking-tight">{label}</span>
         </div>
         {badgeCount && badgeCount > 0 && (
-          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black ${isActive ? 'bg-white text-eln' : 'bg-orange-500 text-white'}`}>
+          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black ${isActive ? 'bg-white text-eln-primary' : 'bg-eln-primary text-white'}`}>
             {badgeCount}
           </span>
         )}
@@ -127,7 +127,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }) => {
   );
 
   return (
-    <div className="flex h-screen overflow-hidden relative bg-gray-50">
+    <div className="flex h-screen overflow-hidden relative bg-eln-bg">
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
@@ -135,7 +135,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-eln/40 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-eln-orange-deep/40 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
@@ -159,7 +159,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }) => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto relative w-full">
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 sm:px-8 py-3 sm:py-4 flex justify-between items-center">
+        <header className="sticky top-0 z-30 bg-eln-bg/80 backdrop-blur-md border-b border-gray-100 px-4 sm:px-8 py-3 sm:py-4 flex justify-between items-center">
           <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
             <button 
               className="p-2 -ml-2 text-gray-400 lg:hidden"
@@ -178,7 +178,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }) => {
                 <p className="text-sm font-black text-gray-900 leading-none">{user.name}</p>
                 <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1">Administrator</p>
               </div>
-              <div className="h-10 w-10 sm:h-12 sm:w-12 bg-eln text-white rounded-full flex items-center justify-center font-black text-lg shadow-lg shadow-eln/20 select-none">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 bg-eln-primary text-white rounded-full flex items-center justify-center font-black text-lg shadow-lg shadow-eln-primary/20 select-none">
                 {user.name.charAt(0)}
               </div>
             </div>
@@ -207,7 +207,7 @@ const AdminOverview = () => {
   const merchants = mockDb.getUsers().filter(u => u.role === UserRole.MERCHANT);
   
   const stats = [
-    { label: "Total Deliveries", value: orders.length, icon: Package, color: "text-eln", bg: "bg-eln/5" },
+    { label: "Total Deliveries", value: orders.length, icon: Package, color: "text-eln-primary", bg: "bg-eln-primary/5" },
     { label: "Active Riders", value: riders.filter(r => r.isAvailable).length, icon: Bike, color: "text-purple-600", bg: "bg-purple-50" },
     { label: "Total Merchants", value: merchants.length, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
     { label: "Success Rate", value: "96%", icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
@@ -247,7 +247,7 @@ const AdminOverview = () => {
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 800, fill: '#94a3b8'}} />
               <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 800, fill: '#94a3b8'}} />
               <Tooltip contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', fontWeight: 800 }} />
-              <Bar dataKey="orders" fill="#034287" radius={[6, 6, 0, 0]} barSize={40} />
+              <Bar dataKey="orders" fill="#FF7A00" radius={[6, 6, 0, 0]} barSize={40} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -301,11 +301,11 @@ const AdminOrders = () => {
             <tbody className="divide-y divide-gray-50">
               {allOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-8 py-5 font-black text-eln">#{order.id.slice(0, 6)}</td>
-                  <td className="px-8 py-5 font-black text-gray-900">{order.merchantName}</td>
+                  <td className="px-8 py-5 font-black text-eln-primary">#{order.id.slice(0, 6)}</td>
+                  <td className="px-8 py-5 font-black text-eln-orange-deep">{order.merchantName}</td>
                   <td className="px-8 py-5">
                     <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tight ${
-                      order.status === OrderStatus.DELIVERED ? 'bg-green-50 text-green-600' : 'bg-eln/5 text-eln'
+                      order.status === OrderStatus.DELIVERED ? 'bg-green-50 text-green-600' : 'bg-eln-primary/5 text-eln-primary'
                     }`}>
                       {order.status}
                     </span>
@@ -317,7 +317,7 @@ const AdminOrders = () => {
                     {order.status === OrderStatus.PENDING && (
                       <button 
                         onClick={() => setShowAssignModal(order)}
-                        className="text-[10px] bg-eln text-white px-4 py-2 rounded-xl hover:bg-eln-dark transition-all font-black uppercase tracking-widest"
+                        className="text-[10px] bg-eln-primary text-white px-4 py-2 rounded-xl hover:bg-eln-primary/90 transition-all font-black uppercase tracking-widest shadow-lg shadow-eln-primary/20"
                       >
                         Assign Rider
                       </button>
@@ -331,10 +331,10 @@ const AdminOrders = () => {
       </div>
 
       {showAssignModal && (
-        <div className="fixed inset-0 bg-eln/60 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-eln-orange-deep/60 backdrop-blur-md z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-[3rem] p-10 w-full max-w-lg shadow-2xl space-y-8 animate-in zoom-in duration-300">
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-black text-gray-900">Assign Rider</h3>
+              <h3 className="text-2xl font-black text-eln-orange-deep">Assign Rider</h3>
               <button onClick={() => setShowAssignModal(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400">
                 <X className="h-6 w-6" />
               </button>
@@ -347,7 +347,7 @@ const AdminOrders = () => {
                   placeholder="Search riders..." 
                   value={riderSearch}
                   onChange={(e) => setRiderSearch(e.target.value)}
-                  className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-sm"
+                  className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-sm"
                 />
               </div>
               <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -355,10 +355,10 @@ const AdminOrders = () => {
                   <button 
                     key={rider.uid}
                     onClick={() => handleAssignRider(rider)}
-                    className="w-full flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl hover:bg-eln/5 transition-all group"
+                    className="w-full flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl hover:bg-eln-primary/5 transition-all group"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="h-10 w-10 rounded-xl bg-eln/10 text-eln flex items-center justify-center font-bold">
+                      <div className="h-10 w-10 rounded-xl bg-eln-primary/10 text-eln-primary flex items-center justify-center font-bold">
                         {rider.name.charAt(0)}
                       </div>
                       <div className="text-left">
@@ -366,7 +366,7 @@ const AdminOrders = () => {
                         <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{rider.phone}</p>
                       </div>
                     </div>
-                    <Plus className="h-5 w-5 text-eln" />
+                    <Plus className="h-5 w-5 text-eln-primary" />
                   </button>
                 ))}
               </div>
@@ -416,11 +416,11 @@ const AdminControls = () => {
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center space-x-2 ${
-              activeTab === tab.id ? 'bg-eln text-white shadow-lg' : 'text-gray-400 hover:text-gray-600'
+              activeTab === tab.id ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-gray-400 hover:text-gray-600'
             }`}
           >
             <span>{tab.label}</span>
-            {tab.count > 0 && <span className={`px-1.5 py-0.5 rounded-md text-[8px] ${activeTab === tab.id ? 'bg-white text-eln' : 'bg-gray-100 text-gray-400'}`}>{tab.count}</span>}
+            {tab.count > 0 && <span className={`px-1.5 py-0.5 rounded-md text-[8px] ${activeTab === tab.id ? 'bg-white text-eln-primary' : 'bg-gray-100 text-gray-400'}`}>{tab.count}</span>}
           </button>
         ))}
       </div>
@@ -429,7 +429,7 @@ const AdminControls = () => {
         {(activeTab === 'verifications' ? pendingVerifications : activeTab === 'merchants' ? merchants : riders).map(u => (
           <div key={u.uid} className="bg-white p-8 rounded-4xl border border-gray-100 shadow-sm hover:shadow-xl transition-all space-y-6">
             <div className="flex items-center justify-between">
-              <div className="h-14 w-14 bg-eln/10 rounded-2xl flex items-center justify-center text-eln font-black text-xl">
+              <div className="h-14 w-14 bg-eln-primary/10 rounded-2xl flex items-center justify-center text-eln-primary font-black text-xl">
                 {u.name.charAt(0)}
               </div>
               <button onClick={() => handleDelete(u.uid)} className="p-2 text-gray-300 hover:text-red-500 transition-colors">
@@ -437,7 +437,7 @@ const AdminControls = () => {
               </button>
             </div>
             <div>
-              <h4 className="font-black text-gray-900 text-lg">{u.businessName || u.name}</h4>
+              <h4 className="font-black text-eln-orange-deep text-lg">{u.businessName || u.name}</h4>
               <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{u.role} • {u.phone || 'No Phone'}</p>
               {u.verificationStatus === VerificationStatus.REJECTED && (
                 <p className="text-[10px] text-red-500 font-bold mt-2">Rejected: {u.rejectionReason}</p>
@@ -445,14 +445,14 @@ const AdminControls = () => {
             </div>
             {activeTab === 'verifications' ? (
               <div className="space-y-3">
-                <button onClick={() => setSelectedUser(u)} className="w-full py-3 bg-gray-50 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-eln hover:text-white transition-all">Review Documents</button>
+                <button onClick={() => setSelectedUser(u)} className="w-full py-3 bg-gray-50 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-eln-primary hover:text-white transition-all">Review Documents</button>
                 <div className="flex space-x-3">
-                  <button onClick={() => handleAction(u.uid, VerificationStatus.VERIFIED)} className="flex-1 py-3 bg-eln text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-eln/20">Approve</button>
+                  <button onClick={() => handleAction(u.uid, VerificationStatus.VERIFIED)} className="flex-1 py-3 bg-eln-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-eln-primary/20">Approve</button>
                   <button onClick={() => setShowRejectModal(u)} className="px-4 py-3 bg-red-50 text-red-500 rounded-xl font-black text-[10px] uppercase tracking-widest">Reject</button>
                 </div>
               </div>
             ) : (
-              <button onClick={() => setSelectedUser(u)} className="w-full py-3 bg-gray-50 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-eln hover:text-white transition-all">View Details</button>
+              <button onClick={() => setSelectedUser(u)} className="w-full py-3 bg-gray-50 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-eln-primary hover:text-white transition-all">View Details</button>
             )}
           </div>
         ))}
@@ -460,10 +460,10 @@ const AdminControls = () => {
 
       {/* User Details Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-eln/60 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-eln-orange-deep/60 backdrop-blur-md z-[70] flex items-center justify-center p-4">
           <div className="bg-white rounded-[3rem] p-10 w-full max-w-2xl shadow-2xl space-y-8 animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-black text-gray-900">User Verification</h3>
+              <h3 className="text-2xl font-black text-eln-orange-deep">User Verification</h3>
               <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400">
                 <X className="h-6 w-6" />
               </button>
@@ -476,20 +476,20 @@ const AdminControls = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between border-b border-gray-200 pb-2">
                       <span className="text-[10px] font-black uppercase text-gray-400">Full Name</span>
-                      <span className="text-sm font-bold">{selectedUser.name}</span>
+                      <span className="text-sm font-bold text-gray-900">{selectedUser.name}</span>
                     </div>
                     <div className="flex justify-between border-b border-gray-200 pb-2">
                       <span className="text-[10px] font-black uppercase text-gray-400">Email</span>
-                      <span className="text-sm font-bold">{selectedUser.email}</span>
+                      <span className="text-sm font-bold text-gray-900">{selectedUser.email}</span>
                     </div>
                     <div className="flex justify-between border-b border-gray-200 pb-2">
                       <span className="text-[10px] font-black uppercase text-gray-400">Role</span>
-                      <span className="text-sm font-bold uppercase">{selectedUser.role}</span>
+                      <span className="text-sm font-bold uppercase text-gray-900">{selectedUser.role}</span>
                     </div>
                     {selectedUser.plateNumber && (
                       <div className="flex justify-between border-b border-gray-200 pb-2">
                         <span className="text-[10px] font-black uppercase text-gray-400">Plate Number</span>
-                        <span className="text-sm font-bold text-eln">{selectedUser.plateNumber}</span>
+                        <span className="text-sm font-bold text-eln-primary">{selectedUser.plateNumber}</span>
                       </div>
                     )}
                   </div>
@@ -499,7 +499,7 @@ const AdminControls = () => {
                   <div className="flex space-x-3">
                     <button 
                       onClick={() => handleAction(selectedUser.uid, VerificationStatus.VERIFIED)}
-                      className="flex-1 py-4 bg-eln text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-eln/20"
+                      className="flex-1 py-4 bg-eln-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-eln-primary/20"
                     >
                       Approve Rider
                     </button>
@@ -553,10 +553,10 @@ const AdminControls = () => {
 
       {/* Rejection Modal */}
       {showRejectModal && (
-        <div className="fixed inset-0 bg-eln/60 backdrop-blur-md z-[80] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-eln-orange-deep/60 backdrop-blur-md z-[80] flex items-center justify-center p-4">
           <div className="bg-white rounded-[3rem] p-10 w-full max-w-md shadow-2xl space-y-8 animate-in zoom-in duration-300">
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-black text-gray-900">Reject Verification</h3>
+              <h3 className="text-2xl font-black text-eln-orange-deep">Reject Verification</h3>
               <button onClick={() => setShowRejectModal(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400">
                 <X className="h-6 w-6" />
               </button>
@@ -614,7 +614,7 @@ const AdminPricingRules = () => {
         </div>
         <button 
           onClick={() => setEditingRule({ id: Math.random().toString(36).substring(7), name: '', baseFee: 0, perKmFee: 0, surgeMultiplier: 1, isActive: true })}
-          className="px-8 py-4 bg-eln text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln/20 hover:scale-105 transition-all"
+          className="px-8 py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 hover:scale-105 transition-all"
         >
           Add New Rule
         </button>
@@ -632,7 +632,7 @@ const AdminPricingRules = () => {
                 </p>
               </div>
               <div className="flex space-x-2">
-                <button onClick={() => setEditingRule(rule)} className="p-3 bg-gray-50 rounded-xl text-gray-400 hover:text-eln transition-colors">
+                <button onClick={() => setEditingRule(rule)} className="p-3 bg-gray-50 rounded-xl text-gray-400 hover:text-eln-primary transition-colors">
                   <Settings className="h-5 w-5" />
                 </button>
                 <button 
@@ -654,7 +654,7 @@ const AdminPricingRules = () => {
               </div>
               <div className="bg-gray-50 p-4 rounded-2xl">
                 <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Surge</p>
-                <p className="text-sm font-black text-eln">{rule.surgeMultiplier}x</p>
+                <p className="text-sm font-black text-eln-primary">{rule.surgeMultiplier}x</p>
               </div>
             </div>
           </div>
@@ -662,10 +662,10 @@ const AdminPricingRules = () => {
       </div>
 
       {editingRule && (
-        <div className="fixed inset-0 bg-eln/60 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-eln-orange-deep/60 backdrop-blur-md z-[70] flex items-center justify-center p-4">
           <div className="bg-white rounded-[3rem] p-10 w-full max-w-lg shadow-2xl space-y-8 animate-in zoom-in duration-300">
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-black text-gray-900">Edit Rule</h3>
+              <h3 className="text-2xl font-black text-eln-orange-deep">Edit Rule</h3>
               <button onClick={() => setEditingRule(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400">
                 <X className="h-6 w-6" />
               </button>
@@ -689,7 +689,7 @@ const AdminPricingRules = () => {
                 <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Surge Multiplier</label>
                 <input required type="number" step="0.1" value={editingRule.surgeMultiplier} onChange={e => setEditingRule({...editingRule, surgeMultiplier: Number(e.target.value)})} className="w-full p-4 bg-gray-50 border-none rounded-2xl font-bold text-gray-900" />
               </div>
-              <button type="submit" className="w-full py-5 bg-eln text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-eln/20">Save Rule</button>
+              <button type="submit" className="w-full py-5 bg-eln-primary text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-eln-primary/20">Save Rule</button>
             </form>
           </div>
         </div>
@@ -728,12 +728,12 @@ const AdminReports = () => {
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 800, fill: '#94a3b8'}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 800, fill: '#94a3b8'}} tickFormatter={v => `₦${v/1000}k`} />
                 <Tooltip contentStyle={{ borderRadius: '24px', border: 'none', fontWeight: 800 }} />
-                <Bar dataKey="rev" fill="#034287" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="rev" fill="#FF7A00" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
-        <div className="bg-eln p-10 rounded-4xl text-white flex flex-col justify-between shadow-2xl shadow-eln/30 relative overflow-hidden">
+        <div className="bg-gradient-eln-deep p-10 rounded-4xl text-white flex flex-col justify-between shadow-2xl shadow-eln-orange-deep/30 relative overflow-hidden">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
           <div className="relative z-10">
             <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">Total Platform Revenue</p>
@@ -784,7 +784,7 @@ const AdminDisputes = () => {
 
       <div className="space-y-4">
         {disputes.map(dispute => (
-          <div key={dispute.id} className="bg-white p-8 rounded-4xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-eln/20 transition-all">
+          <div key={dispute.id} className="bg-white p-8 rounded-4xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-eln-primary/20 transition-all">
             <div className="flex items-center space-x-6">
               <div className={`p-4 rounded-2xl ${dispute.status === 'pending' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
                 <AlertTriangle className="h-6 w-6" />
@@ -796,13 +796,13 @@ const AdminDisputes = () => {
                     {dispute.status}
                   </span>
                 </div>
-                <h4 className="text-lg font-black text-gray-900">{dispute.userName}</h4>
+                <h4 className="text-lg font-black text-eln-orange-deep">{dispute.userName}</h4>
                 <p className="text-xs text-gray-500 font-medium">{dispute.reason}</p>
               </div>
             </div>
             <button 
               onClick={() => setSelectedDispute(dispute)}
-              className="px-6 py-3 bg-gray-50 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-eln hover:text-white transition-all"
+              className="px-6 py-3 bg-gray-50 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-eln-primary hover:text-white transition-all"
             >
               {dispute.status === 'pending' ? 'Resolve Dispute' : 'View Resolution'}
             </button>
@@ -811,10 +811,10 @@ const AdminDisputes = () => {
       </div>
 
       {selectedDispute && (
-        <div className="fixed inset-0 bg-eln/60 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-eln-orange-deep/60 backdrop-blur-md z-[70] flex items-center justify-center p-4">
           <div className="bg-white rounded-[3rem] p-10 w-full max-w-lg shadow-2xl space-y-8 animate-in zoom-in duration-300">
             <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-black text-gray-900">Dispute Details</h3>
+              <h3 className="text-2xl font-black text-eln-orange-deep">Dispute Details</h3>
               <button onClick={() => setSelectedDispute(null)} className="p-2 hover:bg-gray-100 rounded-full text-gray-400">
                 <X className="h-6 w-6" />
               </button>
@@ -830,7 +830,7 @@ const AdminDisputes = () => {
                   <textarea id="resolution" className="w-full p-4 bg-gray-50 border-none rounded-2xl font-bold text-sm h-32 resize-none" placeholder="Enter resolution details..."></textarea>
                   <button 
                     onClick={() => handleResolve(selectedDispute.id, (document.getElementById('resolution') as HTMLTextAreaElement).value)}
-                    className="w-full py-5 bg-eln text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-eln/20"
+                    className="w-full py-5 bg-eln-primary text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-eln-primary/20"
                   >
                     Confirm Resolution
                   </button>
