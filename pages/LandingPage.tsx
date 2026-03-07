@@ -8,6 +8,8 @@ import {
   Zap, 
   Smartphone,
   CheckCircle2,
+  Package,
+  Clock,
   ChevronDown,
   ChevronUp,
   Menu,
@@ -49,6 +51,38 @@ const Typewriter: React.FC<{ text: string; delay?: number; speed?: number }> = (
       {displayedText}
       {!isComplete && <span className="typewriter-cursor" />}
     </span>
+  );
+};
+
+const Counter: React.FC<{ end: number; duration?: number; suffix?: string }> = ({ end, duration = 2, suffix = '' }) => {
+  const [count, setCount] = useState(0);
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    if (!isInView) return;
+    
+    let start = 0;
+    const increment = end / (duration * 60);
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 1000 / 60);
+
+    return () => clearInterval(timer);
+  }, [isInView, end, duration]);
+
+  return (
+    <motion.span 
+      onViewportEnter={() => setIsInView(true)}
+      viewport={{ once: true }}
+    >
+      {count.toLocaleString()}{suffix}
+    </motion.span>
   );
 };
 
@@ -105,24 +139,32 @@ const LandingPage: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen selection:bg-eln/10">
       {/* Enhanced Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
-        isScrolled 
-          ? 'py-4' 
-          : 'py-8'
-      }`}>
+      <motion.nav 
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+          isScrolled 
+            ? 'py-4' 
+            : 'py-8'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className={`flex justify-between items-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
             isScrolled 
               ? 'bg-white/80 backdrop-blur-2xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] rounded-[2.5rem] px-8 h-16' 
               : 'bg-transparent h-20'
           }`}>
-            <div className="flex items-center space-x-3">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center space-x-3"
+            >
               <Logo 
                 className={`transition-all duration-500 ${isScrolled ? 'h-6 scale-90' : 'h-7 scale-110'}`} 
                 showText={true} 
                 variant={isScrolled ? 'default' : 'white'}
               />
-            </div>
+            </motion.div>
             
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-10">
@@ -162,17 +204,29 @@ const LandingPage: React.FC = () => {
                 </AnimatePresence>
               </div>
               
-              <Link to="/login" className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-                isScrolled ? 'text-gray-500 hover:text-eln' : 'text-white/80 hover:text-white'
-              }`}>
-                {common.login}
+              <Link to="/login">
+                <motion.span 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 inline-block ${
+                    isScrolled ? 'text-gray-500 hover:text-eln' : 'text-white/80 hover:text-white'
+                  }`}
+                >
+                  {common.login}
+                </motion.span>
               </Link>
-              <Link to="/signup" className={`px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 shadow-xl active:scale-95 ${
-                isScrolled 
-                  ? 'bg-eln text-white shadow-eln/20 hover:shadow-eln/30' 
-                  : 'bg-white text-gray-900 shadow-white/10 hover:shadow-white/20'
-              }`}>
-                {common.joinNow}
+              <Link to="/signup">
+                <motion.div 
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 shadow-xl ${
+                    isScrolled 
+                      ? 'bg-eln text-white shadow-eln/20 hover:shadow-eln/30' 
+                      : 'bg-white text-gray-900 shadow-white/10 hover:shadow-white/20'
+                  }`}
+                >
+                  {common.joinNow}
+                </motion.div>
               </Link>
             </div>
 
@@ -250,7 +304,7 @@ const LandingPage: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </nav>
+      </motion.nav>
 
       {/* Hero Section: Immersive Background Slider */}
       <header className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900">
@@ -315,20 +369,41 @@ const LandingPage: React.FC = () => {
             {t.heroDesc}
           </motion.p>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
-          >
-            <Link to="/signup" className="w-full sm:w-auto px-8 sm:px-12 py-5 sm:py-6 bg-white text-gray-900 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-2xl shadow-white/10 flex items-center justify-center space-x-3 hover:bg-gray-100 transition-all animate-glow border border-white/20">
-              <span>{common.getStarted}</span>
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-            <Link to="/login" className="w-full sm:w-auto px-8 sm:px-12 py-5 sm:py-6 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center hover:bg-white/20 transition-all">
-              {common.merchantLogin}
-            </Link>
-          </motion.div>
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 3.5 }}
+              className="w-full sm:w-auto"
+            >
+              <Link to="/signup" className="w-full px-8 sm:px-10 py-5 bg-white text-gray-900 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-white/10 flex items-center justify-center space-x-3 hover:bg-gray-100 transition-all animate-glow border border-white/20">
+                <span>{common.getStarted}</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 3.7 }}
+              className="w-full sm:w-auto"
+            >
+              <Link to="/login" className="w-full px-8 sm:px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center hover:bg-white/20 transition-all">
+                Online Merchant Login
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 3.9 }}
+              className="w-full sm:w-auto"
+            >
+              <Link to="/login" className="w-full px-8 sm:px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center hover:bg-white/20 transition-all">
+                Rider Login
+              </Link>
+            </motion.div>
+          </div>
         </div>
 
         {/* Hero Indicators & Floating Trust */}
@@ -360,7 +435,7 @@ const LandingPage: React.FC = () => {
         </div>
       </header>
 
-      {/* MVP Features: No fluff, just utility */}
+      {/* MVP Features: Expanded Services */}
       <section id="services" className="py-32 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
           <div className="text-center mb-20">
@@ -391,29 +466,50 @@ const LandingPage: React.FC = () => {
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10">
             {[
               { 
                 title: t.swiftDispatch, 
-                desc: "Optimized routing for high-priority drops. Our fleet is strategically positioned to ensure your products reach customers while the trend is still hot.", 
+                desc: t.swiftDispatchDesc, 
                 icon: Zap, 
                 image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop",
                 tag: "Speed"
               },
               { 
                 title: t.productIntegrity, 
-                desc: "Bespoke handling protocols for delicate fabrics and luxury items. We use specialized packaging and climate-aware transit to preserve every detail.", 
+                desc: t.productIntegrityDesc, 
                 icon: ShieldCheck, 
                 image: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1200&auto=format&fit=crop",
                 tag: "Safety"
               },
               { 
                 title: t.realTimeGrid, 
-                desc: "End-to-end visibility through our proprietary logistics grid. Track every movement with sub-meter precision and automated status updates.", 
+                desc: t.realTimeGridDesc, 
                 icon: Smartphone, 
-                image: "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?q=80&w=1200&auto=format&fit=crop",
-                tag: "Tech"
+                image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
+                tag: "Transparency"
               },
+              { 
+                title: t.bulkShipping, 
+                desc: t.bulkShippingDesc, 
+                icon: Package, 
+                image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&auto=format&fit=crop",
+                tag: "Volume"
+              },
+              { 
+                title: t.scheduledPickups, 
+                desc: t.scheduledPickupsDesc, 
+                icon: Clock, 
+                image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop",
+                tag: "Planning"
+              },
+              { 
+                title: "Verified Network", 
+                desc: "Every rider in our network is background-checked and professionally trained to represent your brand.", 
+                icon: CheckCircle2, 
+                image: "https://images.unsplash.com/photo-1558603668-6570496b66f8?q=80&w=1200&auto=format&fit=crop",
+                tag: "Trust"
+              }
             ].map((service, idx) => (
               <motion.div 
                 key={idx}
@@ -472,6 +568,159 @@ const LandingPage: React.FC = () => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Brand Section */}
+      <section className="py-32 bg-gray-900 text-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-eln rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-eln rounded-full blur-[120px]" />
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="space-y-8">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="inline-flex items-center space-x-2 px-3 py-1 bg-white/10 rounded-full text-white text-[10px] font-black uppercase tracking-widest"
+              >
+                <span>Our Identity</span>
+              </motion.div>
+              <h2 className="text-5xl sm:text-7xl font-black tracking-tighter leading-[0.9]">
+                {t.aboutTitle} <br />
+                <span className="text-white/40">{t.aboutSubtitle}</span>
+              </h2>
+              <p className="text-white/60 text-lg font-medium leading-relaxed max-w-xl">
+                {t.aboutDesc}
+              </p>
+              <div className="grid grid-cols-2 gap-8 pt-8">
+                <div>
+                  <div className="text-4xl font-black mb-1">
+                    <Counter end={500} suffix="+" />
+                  </div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-white/40">Active Merchants</div>
+                </div>
+                <div>
+                  <div className="text-4xl font-black mb-1">
+                    <Counter end={15000} suffix="+" />
+                  </div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-white/40">Successful Missions</div>
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+                whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                animate={{ 
+                  y: [0, -15, 0],
+                  rotate: [0, 0.5, 0]
+                }}
+                transition={{ 
+                  initial: { duration: 0.8 },
+                  animate: { duration: 5, repeat: Infinity, ease: "easeInOut" }
+                }}
+                viewport={{ once: true }}
+                className="rounded-[4rem] overflow-hidden aspect-square relative shadow-2xl shadow-eln/30 border border-white/10"
+              >
+                <img 
+                  src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?q=80&w=1000&auto=format&fit=crop" 
+                  alt="Professional Business Logistics"
+                  className="w-full h-full object-cover grayscale brightness-90 hover:grayscale-0 transition-all duration-1000 scale-110"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-eln/20 to-transparent mix-blend-overlay" />
+              </motion.div>
+              <div className="absolute -bottom-10 -left-10 bg-white p-8 rounded-[3rem] text-gray-900 shadow-2xl hidden md:block">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-eln rounded-2xl flex items-center justify-center text-white">
+                    <ShieldCheck className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-black uppercase tracking-widest">Secured</div>
+                    <div className="text-[10px] text-gray-400 font-bold">Transit Insurance Included</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-24">
+            <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tighter mb-6">
+              {t.howItWorksTitle}
+            </h2>
+            <p className="text-gray-500 font-medium text-lg">
+              {t.howItWorksDesc}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+            <div className="absolute top-1/2 left-0 w-full h-px bg-gray-100 -translate-y-1/2 hidden md:block z-0" />
+            
+            {t.merchantSteps.map((step: any, i: number) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.2 }}
+                className="relative z-10 text-center space-y-6"
+              >
+                <div className="w-20 h-20 bg-white border-4 border-gray-50 rounded-full flex items-center justify-center mx-auto shadow-xl text-eln font-black text-2xl">
+                  0{i + 1}
+                </div>
+                <h3 className="text-xl font-black text-gray-900">{step.title}</h3>
+                <p className="text-gray-500 text-sm font-medium leading-relaxed px-4">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-32 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="flex flex-col lg:flex-row gap-20">
+            <div className="lg:w-1/3 space-y-8">
+              <h2 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tighter leading-[0.9]">
+                {t.whyChooseUsTitle}
+              </h2>
+              <p className="text-gray-500 font-medium">
+                {t.whyChooseUsDesc}
+              </p>
+              <div className="pt-4">
+                <Link to="/signup" className="inline-flex items-center space-x-3 text-eln font-black text-[10px] uppercase tracking-widest group">
+                  <span>Start Shipping Now</span>
+                  <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+            <div className="lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {t.reasons.map((reason: any, i: number) => (
+                <div key={i} className="bg-white p-10 rounded-[3rem] shadow-sm border border-gray-100">
+                  <div className="w-12 h-12 bg-eln/5 rounded-2xl flex items-center justify-center text-eln mb-6">
+                    <CheckCircle2 className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-xl font-black text-gray-900 mb-3">{reason.title}</h3>
+                  <p className="text-gray-500 text-sm font-medium leading-relaxed">{reason.desc}</p>
+                </div>
+              ))}
+              <div className="bg-eln p-10 rounded-[3rem] text-white flex flex-col justify-between">
+                <h3 className="text-2xl font-black leading-tight">Ready to experience the Elite difference?</h3>
+                <Link to="/signup" className="mt-8 py-4 bg-white text-gray-900 rounded-2xl font-black text-[10px] uppercase tracking-widest text-center hover:bg-gray-100 transition-all">
+                  Get Started
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

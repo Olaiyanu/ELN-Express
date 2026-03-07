@@ -56,6 +56,8 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     profilePicture: localUser.profilePicture || '',
     plateNumber: localUser.plateNumber || ''
   });
+  const [verificationInput, setVerificationInput] = useState('');
+  const [verificationError, setVerificationError] = useState(false);
   const navigate = useNavigate();
 
   const fetchOrders = () => {
@@ -268,7 +270,15 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
   };
 
   const updateStatus = (orderId: string, status: OrderStatus) => {
+    if (status === OrderStatus.DELIVERED && activeOrder) {
+      if (verificationInput.toUpperCase() !== activeOrder.verificationCode) {
+        setVerificationError(true);
+        return;
+      }
+    }
     mockDb.updateOrderStatus(orderId, status);
+    setVerificationInput('');
+    setVerificationError(false);
     fetchOrders();
   };
 
@@ -478,6 +488,32 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
                                  <p className="font-black text-base text-gray-800 mb-1">{activeOrder.customerName}</p>
                                  <p className="text-xs text-gray-500 font-medium leading-relaxed">{activeOrder.deliveryAddress}</p>
                               </div>
+                           </div>
+
+                           <div className="bg-gray-50 p-6 rounded-3xl space-y-3 border border-gray-100">
+                              <div className="flex items-center space-x-3">
+                                 <Package className="h-4 w-4 text-eln" />
+                                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Product Details</p>
+                              </div>
+                              <p className="text-sm font-bold text-gray-700">{activeOrder.itemsDescription || 'No description provided'}</p>
+                           </div>
+
+                           <div className="space-y-3">
+                              <div className="flex justify-between items-center">
+                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verification Code</p>
+                                 {verificationError && <span className="text-[9px] font-black text-red-500 uppercase">Invalid Code</span>}
+                              </div>
+                              <input 
+                                 type="text" 
+                                 value={verificationInput}
+                                 onChange={(e) => {
+                                   setVerificationInput(e.target.value);
+                                   setVerificationError(false);
+                                 }}
+                                 placeholder="Enter 5-digit code from customer"
+                                 className={`w-full p-4 bg-gray-50 border-2 rounded-2xl font-black text-center tracking-[0.5em] focus:ring-0 transition-all ${verificationError ? 'border-red-500 text-red-500' : 'border-gray-100 text-gray-900 focus:border-eln'}`}
+                                 maxLength={5}
+                              />
                            </div>
                            
                            <div className="flex flex-col space-y-3">

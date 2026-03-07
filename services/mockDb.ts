@@ -159,7 +159,7 @@ export const mockDb = {
           id: Math.random().toString(36).substring(2, 11),
           userId: riderId,
           title: 'New Mission Assigned',
-          message: `You have been assigned to order #${order.id.slice(0, 8)}. Check your active jobs.`,
+          message: `You have been assigned to order #${order.id.slice(0, 8)}. Items: ${order.itemsDescription || 'N/A'}. Verification Code: ${order.verificationCode}.`,
           type: 'order',
           read: false,
           createdAt: Date.now()

@@ -62,6 +62,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
   const [newOrder, setNewOrder] = useState({
     customerName: '',
     customerPhone: '',
+    customerEmail: '',
     deliveryAddress: '',
     pickupAddress: 'Lagos Fashion Hub, Victoria Island',
     itemsDescription: ''
@@ -119,6 +120,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
 
   const handleCreateOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    const verificationCode = Math.random().toString(36).substring(2, 7).toUpperCase();
     const order: Order = {
       id: Math.random().toString(36).substring(2, 11).toUpperCase(),
       merchantId: user.uid,
@@ -126,9 +128,11 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
       merchantPhone: user.phone || '0800-ELN-MERCHANT',
       customerName: newOrder.customerName,
       customerPhone: newOrder.customerPhone,
+      customerEmail: newOrder.customerEmail,
       deliveryAddress: newOrder.deliveryAddress,
       pickupAddress: newOrder.pickupAddress,
       itemsDescription: newOrder.itemsDescription,
+      verificationCode: verificationCode,
       status: OrderStatus.PENDING,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -137,6 +141,10 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
       deliveryFee: 1500
     };
     mockDb.saveOrder(order);
+    
+    // Simulate sending email to customer
+    console.log(`[MOCK EMAIL] To: ${newOrder.customerEmail} | Message: Your delivery code is ${verificationCode}. Please provide this to the rider upon delivery.`);
+    
     refreshOrders();
     setShowCreateModal(false);
     resetForm();
@@ -147,6 +155,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
     setNewOrder({
       customerName: '',
       customerPhone: '',
+      customerEmail: '',
       deliveryAddress: '',
       pickupAddress: 'Lagos Fashion Hub, Victoria Island',
       itemsDescription: ''
@@ -492,6 +501,14 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
                          <input required type="tel" value={newOrder.customerPhone} onChange={e => setNewOrder({...newOrder, customerPhone: e.target.value})} placeholder="+234 800 000 0000" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" />
                       </div>
+                    </div>
+                 </div>
+
+                 <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Customer Email</label>
+                    <div className="relative">
+                       <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+                       <input required type="email" value={newOrder.customerEmail} onChange={e => setNewOrder({...newOrder, customerEmail: e.target.value})} placeholder="customer@example.com" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln font-bold text-gray-900" />
                     </div>
                  </div>
                  

@@ -61,6 +61,8 @@ export interface Order {
   deliveryAddress: string;
   customerName: string;
   customerPhone: string;
+  customerEmail?: string;
+  verificationCode?: string;
   status: OrderStatus;
   createdAt: number;
   updatedAt: number;
