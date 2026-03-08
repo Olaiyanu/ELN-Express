@@ -50,7 +50,12 @@ import {
   ResponsiveContainer,
   ComposedChart,
   Area,
-  Legend
+  Legend,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line
 } from 'recharts';
 
 interface AdminDashboardProps {
@@ -84,18 +89,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }) => {
       <Link
         to={to}
         onClick={() => setIsMobileMenuOpen(false)}
-        className={`flex items-center justify-between px-5 py-4 rounded-full transition-all duration-300 ${
+        className={`flex items-center justify-between px-5 py-4 rounded-2xl transition-all duration-300 ${
           isActive 
-            ? 'bg-eln-primary text-white shadow-xl shadow-eln-primary/20' 
-            : 'text-gray-500 hover:text-eln-primary hover:bg-eln-primary/5'
+            ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
+            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
         }`}
       >
         <div className="flex items-center space-x-4">
-          <Icon className={`h-5 w-5 transition-colors ${isActive ? 'text-white' : 'text-gray-400'}`} />
+          <Icon className={`h-5 w-5 transition-colors ${isActive ? 'text-eln-primary' : 'text-slate-400'}`} />
           <span className="font-bold text-sm tracking-tight">{label}</span>
         </div>
         {badgeCount && badgeCount > 0 && (
-          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black ${isActive ? 'bg-white text-eln-primary' : 'bg-eln-primary text-white'}`}>
+          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black ${isActive ? 'bg-eln-primary text-white' : 'bg-slate-100 text-slate-500'}`}>
             {badgeCount}
           </span>
         )}
@@ -208,16 +213,28 @@ const AdminOverview = () => {
   const orders = mockDb.getOrders();
   const riders = mockDb.getUsers().filter(u => u.role === UserRole.RIDER);
   const merchants = mockDb.getUsers().filter(u => u.role === UserRole.MERCHANT);
+  const pendingVerifications = mockDb.getUsers().filter(u => u.verificationStatus === VerificationStatus.PENDING);
+  
+  const totalRevenue = orders.reduce((sum, order) => sum + (order.deliveryFee || 0), 0);
   
   const stats = [
-    { label: "Total Deliveries", value: orders.length, icon: Package, color: "text-eln-primary", bg: "bg-eln-primary/5" },
+    { label: "Total Revenue", value: `₦${totalRevenue.toLocaleString()}`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50" },
     { label: "Active Riders", value: riders.filter(r => r.isAvailable).length, icon: Bike, color: "text-purple-600", bg: "bg-purple-50" },
-    { label: "Total Merchants", value: merchants.length, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Success Rate", value: "96%", icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { label: "Pending Verifications", value: pendingVerifications.length, icon: ShieldCheck, color: "text-amber-600", bg: "bg-amber-50" },
+    { label: "Success Rate", value: "96%", icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50" },
   ];
+
+  const orderStatusData = [
+    { name: 'Delivered', value: orders.filter(o => o.status === OrderStatus.DELIVERED).length, color: '#10b981' },
+    { name: 'Pending', value: orders.filter(o => o.status === OrderStatus.PENDING).length, color: '#f59e0b' },
+    { name: 'In Transit', value: orders.filter(o => o.status === OrderStatus.ASSIGNED || o.status === OrderStatus.IN_TRANSIT).length, color: '#3b82f6' },
+  ];
+
+  const recentActivity = orders.slice(-5).reverse();
 
   return (
     <div className="space-y-10">
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
           <motion.div 
@@ -238,21 +255,93 @@ const AdminOverview = () => {
         ))}
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Performance Chart */}
+        <div className="lg:col-span-2 bg-white p-8 rounded-4xl border border-gray-100 shadow-sm">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight">System Performance</h3>
+            <div className="flex items-center space-x-2">
+              <span className="h-2 w-2 rounded-full bg-eln-primary" />
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Daily Orders</span>
+            </div>
+          </div>
+          <div className="h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={[
+                { name: 'Mon', orders: 12 }, { name: 'Tue', orders: 19 }, { name: 'Wed', orders: 15 },
+                { name: 'Thu', orders: 22 }, { name: 'Fri', orders: 30 }, { name: 'Sat', orders: 25 }, { name: 'Sun', orders: 10 }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 800, fill: '#94a3b8'}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 800, fill: '#94a3b8'}} />
+                <Tooltip contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', fontWeight: 800 }} />
+                <Bar dataKey="orders" fill="#FF7A00" radius={[6, 6, 0, 0]} barSize={40} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Status Distribution */}
+        <div className="bg-white p-8 rounded-4xl border border-gray-100 shadow-sm">
+          <h3 className="text-lg font-black text-gray-900 mb-8 uppercase tracking-tight">Order Status</h3>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={orderStatusData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {orderStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="space-y-3 mt-4">
+            {orderStatusData.map((item, i) => (
+              <div key={i} className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{item.name}</span>
+                </div>
+                <span className="text-xs font-black text-gray-900">{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
       <div className="bg-white p-8 rounded-4xl border border-gray-100 shadow-sm">
-        <h3 className="text-lg font-black text-gray-900 mb-6 uppercase tracking-tight">System Performance</h3>
-        <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={[
-              { name: 'Mon', orders: 12 }, { name: 'Tue', orders: 19 }, { name: 'Wed', orders: 15 },
-              { name: 'Thu', orders: 22 }, { name: 'Fri', orders: 30 }, { name: 'Sat', orders: 25 }, { name: 'Sun', orders: 10 }
-            ]}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 800, fill: '#94a3b8'}} />
-              <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 800, fill: '#94a3b8'}} />
-              <Tooltip contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', fontWeight: 800 }} />
-              <Bar dataKey="orders" fill="#FF7A00" radius={[6, 6, 0, 0]} barSize={40} />
-            </ComposedChart>
-          </ResponsiveContainer>
+        <div className="flex justify-between items-center mb-8">
+          <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight">Recent Activity</h3>
+          <button className="text-[10px] font-black text-eln-primary uppercase tracking-widest hover:underline">View All</button>
+        </div>
+        <div className="space-y-6">
+          {recentActivity.map((order, i) => (
+            <div key={i} className="flex items-center justify-between py-4 border-b border-gray-50 last:border-0">
+              <div className="flex items-center space-x-4">
+                <div className="h-12 w-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400">
+                  <Package className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-black text-gray-900">{order.customerName}</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">#{order.id.slice(0, 8)} • {order.status}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-black text-gray-900">₦{order.deliveryFee?.toLocaleString()}</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -419,11 +508,11 @@ const AdminControls = () => {
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center space-x-2 ${
-              activeTab === tab.id ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-gray-400 hover:text-gray-600'
+              activeTab === tab.id ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20' : 'text-gray-400 hover:text-gray-600'
             }`}
           >
             <span>{tab.label}</span>
-            {tab.count > 0 && <span className={`px-1.5 py-0.5 rounded-md text-[8px] ${activeTab === tab.id ? 'bg-white text-eln-primary' : 'bg-gray-100 text-gray-400'}`}>{tab.count}</span>}
+            {tab.count > 0 && <span className={`px-1.5 py-0.5 rounded-md text-[8px] ${activeTab === tab.id ? 'bg-eln-primary text-white' : 'bg-gray-100 text-gray-400'}`}>{tab.count}</span>}
           </button>
         ))}
       </div>
@@ -725,7 +814,7 @@ const AdminWithdrawals = () => {
               key={f}
               onClick={() => setFilter(f as any)}
               className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                filter === f ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-gray-400 hover:text-gray-600'
+                filter === f ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20' : 'text-gray-400 hover:text-gray-600'
               }`}
             >
               {f}

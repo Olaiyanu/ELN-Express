@@ -212,31 +212,31 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
       <nav className="flex-1 space-y-2">
         <button 
           onClick={() => { setActiveTab('request'); setIsMobileMenuOpen(false); }}
-          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'request' ? 'bg-white/10 text-white shadow-lg' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'request' ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Plus className={`h-5 w-5 ${activeTab === 'request' ? 'text-white' : 'text-white/30'}`} />
+          <Plus className={`h-5 w-5 ${activeTab === 'request' ? 'text-white' : 'text-slate-500'}`} />
           <span className="font-black text-xs uppercase tracking-widest">New Request</span>
         </button>
 
         <button 
           onClick={() => { setActiveTab('history'); setIsMobileMenuOpen(false); }}
-          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'history' ? 'bg-white/10 text-white shadow-lg' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'history' ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <History className={`h-5 w-5 ${activeTab === 'history' ? 'text-white' : 'text-white/30'}`} />
+          <History className={`h-5 w-5 ${activeTab === 'history' ? 'text-white' : 'text-slate-500'}`} />
           <span className="font-black text-xs uppercase tracking-widest">Tracking & History</span>
         </button>
 
         <button 
           onClick={() => { setActiveTab('estimate'); setIsMobileMenuOpen(false); }}
-          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'estimate' ? 'bg-white/10 text-white shadow-lg' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'estimate' ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <DollarSign className={`h-5 w-5 ${activeTab === 'estimate' ? 'text-white' : 'text-white/30'}`} />
+          <DollarSign className={`h-5 w-5 ${activeTab === 'estimate' ? 'text-white' : 'text-slate-500'}`} />
           <span className="font-black text-xs uppercase tracking-widest">Price Estimate</span>
         </button>
       </nav>
 
       <div className="mt-auto pt-8 border-t border-white/5">
-        <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
+        <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
           <LogOut className="h-5 w-5" />
           <span className="font-black text-xs uppercase tracking-widest">Logout</span>
         </button>
@@ -260,12 +260,12 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
       </AnimatePresence>
 
       {/* Mobile Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 w-72 bg-eln-orange-deep z-50 transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 left-0 w-72 bg-slate-950 z-50 transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <SidebarContent />
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className="w-72 bg-eln-orange-deep flex flex-col hidden lg:flex h-screen sticky top-0">
+      <aside className="w-72 bg-slate-950 flex flex-col hidden lg:flex h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
@@ -276,7 +276,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
               <Menu className="h-6 w-6" />
             </button>
             <h1 className="font-black text-xs uppercase tracking-[0.2em] text-gray-400">
-              Merchant Hub <span className="text-gray-200 mx-2">/</span> <span className="text-eln-orange-deep">{activeTab}</span>
+              Merchant Hub <span className="text-gray-200 mx-2">/</span> <span className="text-slate-900">{activeTab}</span>
             </h1>
           </div>
           <div className="flex items-center space-x-4">
@@ -295,7 +295,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div className="space-y-1">
-                  <h2 className="text-3xl font-black text-eln-orange-deep tracking-tight">Delivery Request</h2>
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">Delivery Request</h2>
                   <p className="text-sm text-gray-500 font-medium">Create a new high-priority fashion delivery mission.</p>
                 </div>
                 <button 
@@ -312,7 +312,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                     <Package className="h-6 w-6" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-xl font-black text-eln-orange-deep">Professional Dispatch</h3>
+                    <h3 className="text-xl font-black text-slate-900">Professional Dispatch</h3>
                     <p className="text-sm text-gray-500 leading-relaxed">Our elite fleet of riders is ready to handle your luxury fashion items with the utmost care and speed.</p>
                   </div>
                   <ul className="space-y-3">
@@ -340,55 +340,86 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
               </div>
             </div>
           ) : activeTab === 'history' ? (
-            <div className="space-y-8 animate-in fade-in duration-500">
-              <div className="space-y-1">
-                <h2 className="text-3xl font-black text-eln-orange-deep tracking-tight">Tracking & History</h2>
-                <p className="text-sm text-gray-500 font-medium">Monitor your active deliveries and review past missions.</p>
+            <div className="space-y-10 animate-in fade-in duration-500">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                <div className="space-y-1">
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">Tracking & History</h2>
+                  <p className="text-sm text-gray-500 font-medium">Monitor your active deliveries and review past missions.</p>
+                </div>
+                <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Missions:</span>
+                  <span className="text-xs font-black text-slate-900">{orders.length}</span>
+                </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-6">
                 {orders.length > 0 ? (
                   orders.map(order => (
-                    <div key={order.id} className="bg-white p-6 sm:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-6 group transition-all hover:border-eln-primary/20">
-                      <div className="flex items-start sm:items-center space-x-6 flex-1 min-w-0">
-                        <div className={`p-5 rounded-3xl flex-shrink-0 ${order.status === OrderStatus.DELIVERED ? 'bg-emerald-50 text-emerald-600' : 'bg-eln-primary/5 text-eln-primary'}`}>
-                          <Package className="h-7 w-7" />
+                    <div key={order.id} className="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-8 group transition-all hover:border-eln-primary/20 hover:shadow-xl hover:shadow-black/5">
+                      <div className="flex items-center space-x-6 flex-1 min-w-0">
+                        <div className={`h-16 w-16 rounded-3xl flex-shrink-0 flex items-center justify-center ${order.status === OrderStatus.DELIVERED ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400 group-hover:bg-eln-primary/5 group-hover:text-eln-primary transition-colors'}`}>
+                          <Package className="h-8 w-8" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <span className="text-[10px] font-black text-eln-primary uppercase tracking-widest bg-eln-primary/5 px-2 py-0.5 rounded-lg">#{order.id.slice(0, 8)}</span>
-                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${order.status === OrderStatus.DELIVERED ? 'bg-emerald-100 text-emerald-600' : 'bg-eln-primary/10 text-eln-primary'}`}>
+                          <div className="flex items-center space-x-3 mb-2">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">#{order.id.slice(0, 8)}</span>
+                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                              order.status === OrderStatus.DELIVERED ? 'bg-emerald-100 text-emerald-600' : 
+                              order.status === OrderStatus.PENDING ? 'bg-amber-100 text-amber-600' :
+                              'bg-blue-100 text-blue-600'
+                            }`}>
                               {order.status}
                             </span>
                           </div>
-                          <h3 className="text-xl font-black text-eln-orange-deep truncate">{order.customerName}</h3>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 mt-2">
-                            <p className="text-xs text-gray-400 font-medium flex items-center">
-                              <MapPin className="h-3.5 w-3.5 mr-1.5 text-eln-primary/30" />
-                              <span className="truncate">{order.deliveryAddress}</span>
-                            </p>
+                          <h3 className="text-2xl font-black text-slate-900 truncate mb-3">{order.customerName}</h3>
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-6">
+                            <div className="flex items-center text-xs text-gray-500 font-medium">
+                              <MapPin className="h-4 w-4 mr-2 text-slate-300" />
+                              <span className="truncate max-w-[200px]">{order.deliveryAddress}</span>
+                            </div>
                             {order.riderName && (
-                              <button onClick={() => order.riderId && handleViewRiderProfile(order.riderId)} className="text-xs font-black text-eln-primary hover:underline flex items-center">
-                                <Bike className="h-3.5 w-3.5 mr-1.5" />
-                                {order.riderName}
+                              <button 
+                                onClick={() => order.riderId && handleViewRiderProfile(order.riderId)} 
+                                className="flex items-center text-xs font-black text-slate-400 hover:text-eln-primary transition-colors"
+                              >
+                                <Bike className="h-4 w-4 mr-2" />
+                                <span>{order.riderName}</span>
                               </button>
                             )}
+                            <div className="flex items-center text-xs text-gray-400 font-medium">
+                              <Clock className="h-4 w-4 mr-2 text-slate-300" />
+                              <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-4">
-                         <div className="text-right">
-                            <p className="text-sm font-black text-eln-orange-deep">₦{order.deliveryFee?.toLocaleString()}</p>
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</p>
-                         </div>
+                      
+                      <div className="flex items-center justify-between lg:justify-end lg:space-x-10 border-t lg:border-t-0 pt-6 lg:pt-0 border-gray-50">
+                        <div className="text-left lg:text-right">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Delivery Fee</p>
+                          <p className="text-2xl font-black text-slate-900">₦{order.deliveryFee?.toLocaleString()}</p>
+                        </div>
+                        <button className="p-4 bg-slate-50 text-slate-400 rounded-2xl hover:bg-eln-primary hover:text-white transition-all shadow-sm">
+                          <History className="h-5 w-5" />
+                        </button>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="bg-white p-24 rounded-[3rem] border border-dashed border-gray-200 text-center space-y-4">
-                    <Package className="h-16 w-16 text-gray-200 mx-auto" />
-                    <p className="text-gray-900 text-xl font-black">No missions yet</p>
-                    <p className="text-gray-400 font-medium text-sm">Your delivery history will appear here once you start dispatching.</p>
+                  <div className="bg-white p-24 rounded-[4xl] border border-dashed border-gray-200 text-center space-y-6">
+                    <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
+                      <Package className="h-12 w-12 text-gray-200" />
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-gray-900 text-2xl font-black">No missions yet</p>
+                      <p className="text-gray-400 font-medium text-sm max-w-xs mx-auto">Your delivery history will appear here once you start dispatching luxury items.</p>
+                    </div>
+                    <button 
+                      onClick={() => setActiveTab('request')}
+                      className="px-8 py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 hover:scale-105 transition-all"
+                    >
+                      Start First Mission
+                    </button>
                   </div>
                 )}
               </div>
@@ -452,7 +483,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                       <p className="text-xs text-white/60 leading-relaxed">This is a professional estimate based on current traffic and distance. Final price may vary slightly.</p>
                       <button 
                         onClick={() => { setActiveTab('request'); setShowCreateModal(true); }}
-                        className="w-full py-4 bg-white text-eln-orange-deep rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all"
+                        className="w-full py-4 bg-white text-slate-900 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all"
                       >
                         Book Now
                       </button>
@@ -480,12 +511,12 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
               exit={{ opacity: 0, y: 100 }}
               className="bg-white w-full max-w-xl rounded-t-[2.5rem] sm:rounded-[3rem] shadow-2xl p-6 sm:p-12 space-y-8 overflow-y-auto max-h-[95vh]"
             >
-              <div className="flex justify-between items-center">
-                <h3 className="text-2xl font-black text-eln-orange-deep">New Request</h3>
-                <button onClick={() => setShowCreateModal(false)} className="p-3 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-2xl font-black text-slate-900">New Request</h3>
+                      <button onClick={() => setShowCreateModal(false)} className="p-3 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
+                        <X className="h-6 w-6" />
+                      </button>
+                    </div>
               <form onSubmit={handleCreateOrder} className="space-y-6">
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
@@ -554,7 +585,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                   <img src={selectedRider.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedRider.name)}&background=FF7A00&color=fff`} alt="" className="h-full w-full object-cover" />
                 </div>
               </div>
-              <h3 className="text-2xl font-black text-eln-orange-deep mb-1">{selectedRider.name}</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-1">{selectedRider.name}</h3>
               <p className="text-[10px] font-black uppercase tracking-widest text-eln-primary mb-8">Elite Fleet Rider</p>
               <div className="grid grid-cols-2 gap-4 mb-8">
                 <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100">
@@ -589,7 +620,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
               className="bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-8 sm:p-12 space-y-8"
             >
               <div className="flex justify-between items-center">
-                <h3 className="text-2xl font-black text-eln-orange-deep">Edit Profile</h3>
+                <h3 className="text-2xl font-black text-slate-900">Edit Profile</h3>
                 <button onClick={() => setShowProfileModal(false)} className="p-3 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
                   <X className="h-6 w-6" />
                 </button>

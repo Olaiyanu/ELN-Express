@@ -352,25 +352,25 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
       <nav className="flex-1 space-y-2">
         <button 
           onClick={() => { setActiveTab('jobs'); setIsMobileMenuOpen(false); }}
-          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'jobs' ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'jobs' ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Package className={`h-5 w-5 ${activeTab === 'jobs' ? 'text-white' : 'text-white/30'}`} />
+          <Package className={`h-5 w-5 ${activeTab === 'jobs' ? 'text-white' : 'text-slate-500'}`} />
           <span className="font-black text-xs uppercase tracking-widest">Active Jobs</span>
         </button>
 
         <button 
           onClick={() => { setActiveTab('map'); setIsMobileMenuOpen(false); }}
-          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'map' ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'map' ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <MapPin className={`h-5 w-5 ${activeTab === 'map' ? 'text-white' : 'text-white/30'}`} />
+          <MapPin className={`h-5 w-5 ${activeTab === 'map' ? 'text-white' : 'text-slate-500'}`} />
           <span className="font-black text-xs uppercase tracking-widest">Navigation</span>
         </button>
 
         <button 
           onClick={() => { setActiveTab('earnings'); setIsMobileMenuOpen(false); }}
-          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'earnings' ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+          className={`flex items-center space-x-3 w-full px-5 py-4 rounded-2xl transition-all duration-200 ${activeTab === 'earnings' ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Wallet className={`h-5 w-5 ${activeTab === 'earnings' ? 'text-white' : 'text-white/30'}`} />
+          <Wallet className={`h-5 w-5 ${activeTab === 'earnings' ? 'text-white' : 'text-slate-500'}`} />
           <span className="font-black text-xs uppercase tracking-widest">Earnings</span>
         </button>
       </nav>
@@ -400,7 +400,7 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
             {localUser.isAvailable ? <ToggleRight className="h-5 w-5" /> : <ToggleLeft className="h-5 w-5" />}
           </button>
         </div>
-        <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
+        <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
           <LogOut className="h-5 w-5" />
           <span className="font-black text-xs uppercase tracking-widest">Logout</span>
         </button>
@@ -424,12 +424,12 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
       </AnimatePresence>
 
       {/* Mobile Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 w-72 bg-eln-orange-deep z-50 transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 left-0 w-72 bg-slate-950 z-50 transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {isVerified ? <SidebarContent /> : (
           <div className="p-8 flex flex-col h-full">
             <Logo className="h-7 mb-12" showText={true} variant="white" />
             <div className="mt-auto">
-              <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
+              <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
                 <LogOut className="h-5 w-5" />
                 <span className="font-black text-xs uppercase tracking-widest">Logout</span>
               </button>
@@ -439,12 +439,12 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className="w-72 bg-eln-orange-deep flex flex-col hidden lg:flex h-screen sticky top-0">
+      <aside className="w-72 bg-slate-950 flex flex-col hidden lg:flex h-screen sticky top-0">
         {isVerified ? <SidebarContent /> : (
           <div className="p-8 flex flex-col h-full">
             <Logo className="h-7 mb-12" showText={true} variant="white" />
             <div className="mt-auto">
-              <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
+              <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
                 <LogOut className="h-5 w-5" />
                 <span className="font-black text-xs uppercase tracking-widest">Logout</span>
               </button>
@@ -462,7 +462,7 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
               </button>
             )}
             <h1 className="font-black text-xs uppercase tracking-[0.2em] text-gray-400">
-              Rider Dashboard <span className="text-gray-200 mx-2">/</span> <span className="text-eln-orange-deep">{isVerified ? activeTab : 'Verification'}</span>
+              Rider Dashboard <span className="text-gray-200 mx-2">/</span> <span className="text-slate-900">{isVerified ? activeTab : 'Verification'}</span>
             </h1>
           </div>
           
@@ -536,7 +536,7 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
                            <div className="bg-eln-primary/5 p-3 rounded-2xl text-eln-primary"><Package className="h-6 w-6" /></div>
                            <div>
                               <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Merchant Partner</p>
-                              <p className="font-black text-xl text-eln-orange-deep">{activeOrder.merchantName}</p>
+                              <p className="font-black text-xl text-slate-900">{activeOrder.merchantName}</p>
                            </div>
                         </div>
                         <div className="space-y-6">
