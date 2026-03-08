@@ -18,12 +18,10 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ userId }) => {
     setNotifications(data);
   };
 
-  const handleClearAll = (e: React.MouseEvent) => {
+  const handleDeleteOne = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (window.confirm('Clear all notifications?')) {
-      mockDb.clearAllNotifications(userId);
-      refreshNotifications();
-    }
+    mockDb.deleteNotification(id);
+    refreshNotifications();
   };
 
   useEffect(() => {
@@ -67,15 +65,6 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ userId }) => {
               <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                 <div className="flex items-center space-x-3">
                   <h4 className="font-black text-xs uppercase tracking-widest text-gray-900">Notifications</h4>
-                  {notifications.length > 0 && (
-                    <button 
-                      onClick={handleClearAll}
-                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50/50 rounded-lg transition-colors"
-                      title="Clear All"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  )}
                 </div>
                 <button onClick={() => setShowNotifications(false)} className="p-2 text-gray-400 hover:text-gray-600">
                   <X className="h-5 w-5" />
@@ -93,6 +82,13 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ userId }) => {
                       className={`p-4 rounded-2xl transition-all cursor-pointer border ${n.read ? 'bg-white border-gray-100' : 'bg-eln/5 border-eln/10'}`}
                     >
                       <div className="flex items-start space-x-3">
+                        <button 
+                          onClick={(e) => handleDeleteOne(e, n.id)}
+                          className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-1"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                         <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${n.read ? 'bg-gray-100 text-gray-400' : 'bg-eln text-white'}`}>
                           <Bell className="h-4 w-4" />
                         </div>

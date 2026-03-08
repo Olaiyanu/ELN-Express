@@ -816,7 +816,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="bg-eln-orange-deep text-white pt-24 pb-12">
+      <footer className="bg-eln-black-orange text-white pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
             <div className="space-y-8">

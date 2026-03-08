@@ -282,6 +282,13 @@ export const mockDb = {
     }
   },
   
+  deleteNotification: (id: string) => {
+    const data = localStorage.getItem(NOTIFICATIONS_KEY);
+    const all: Notification[] = data ? JSON.parse(data) : [];
+    const filtered = all.filter(n => n.id !== id);
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(filtered));
+  },
+
   clearAllNotifications: (userId: string) => {
     const data = localStorage.getItem(NOTIFICATIONS_KEY);
     const all: Notification[] = data ? JSON.parse(data) : [];
