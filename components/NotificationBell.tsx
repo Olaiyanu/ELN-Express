@@ -5,6 +5,31 @@ import { motion, AnimatePresence } from 'motion/react';
 import { mockDb } from '../services/mockDb';
 import { Notification } from '../types';
 
+const playNotificationSound = () => {
+  try {
+    const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    
+    const audioContext = new AudioContextClass();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+  } catch (e) {
+    console.warn('Audio notification failed', e);
+  }
+};
+
 interface NotificationBellProps {
   userId: string;
 }
@@ -15,7 +40,15 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ userId }) => {
 
   const refreshNotifications = () => {
     const data = mockDb.getNotifications(userId);
-    setNotifications(data);
+    const unreadCount = data.filter(n => !n.read).length;
+    
+    setNotifications(prev => {
+      const prevUnreadCount = prev.filter(n => !n.read).length;
+      if (unreadCount > prevUnreadCount) {
+        playNotificationSound();
+      }
+      return data;
+    });
   };
 
   const handleDeleteOne = (e: React.MouseEvent, id: string) => {

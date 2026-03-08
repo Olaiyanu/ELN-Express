@@ -227,7 +227,7 @@ const AdminOverview = () => {
   const orderStatusData = [
     { name: 'Delivered', value: orders.filter(o => o.status === OrderStatus.DELIVERED).length, color: '#10b981' },
     { name: 'Pending', value: orders.filter(o => o.status === OrderStatus.PENDING).length, color: '#f59e0b' },
-    { name: 'In Transit', value: orders.filter(o => o.status === OrderStatus.ASSIGNED || o.status === OrderStatus.IN_TRANSIT).length, color: '#3b82f6' },
+    { name: 'In Transit', value: orders.filter(o => [OrderStatus.ASSIGNED, OrderStatus.PICKED_UP, OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY].includes(o.status as OrderStatus)).length, color: '#3b82f6' },
   ];
 
   const recentActivity = orders.slice(-5).reverse();

@@ -21,7 +21,8 @@ import {
   Star,
   MessageSquare,
   Bike,
-  Camera
+  Camera,
+  Search
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import NotificationBell from '../components/NotificationBell';
@@ -203,6 +204,20 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
     }
   };
 
+  const [trackingId, setTrackingId] = useState('');
+  const [trackedOrder, setTrackedOrder] = useState<Order | null>(null);
+
+  const handleTrackOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+    const order = orders.find(o => o.id === trackingId.toUpperCase());
+    if (order) {
+      setTrackedOrder(order);
+    } else {
+      alert('Order not found. Please check the ID.');
+      setTrackedOrder(null);
+    }
+  };
+
   const SidebarContent = () => (
     <div className="flex flex-col h-full py-8 px-4">
       <div className="flex items-center space-x-3 px-4 mb-12">
@@ -340,88 +355,178 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
               </div>
             </div>
           ) : activeTab === 'history' ? (
-            <div className="space-y-10 animate-in fade-in duration-500">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">Tracking & History</h2>
-                  <p className="text-sm text-gray-500 font-medium">Monitor your active deliveries and review past missions.</p>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Tracking & History</h2>
+                  <p className="text-xs text-gray-500 font-medium">Monitor active deliveries and review past missions.</p>
                 </div>
-                <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Missions:</span>
-                  <span className="text-xs font-black text-slate-900">{orders.length}</span>
+                <div className="flex items-center space-x-3 bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm self-start">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Total Missions</span>
+                  <span className="text-sm font-black text-eln-primary">{orders.length}</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-6">
-                {orders.length > 0 ? (
-                  orders.map(order => (
-                    <div key={order.id} className="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-8 group transition-all hover:border-eln-primary/20 hover:shadow-xl hover:shadow-black/5">
-                      <div className="flex items-center space-x-6 flex-1 min-w-0">
-                        <div className={`h-16 w-16 rounded-3xl flex-shrink-0 flex items-center justify-center ${order.status === OrderStatus.DELIVERED ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400 group-hover:bg-eln-primary/5 group-hover:text-eln-primary transition-colors'}`}>
-                          <Package className="h-8 w-8" />
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Tracking Section - Sticky on Desktop */}
+                <div className="lg:col-span-4 space-y-6">
+                  <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm sticky top-24 space-y-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="h-8 w-8 bg-eln-primary/10 rounded-lg flex items-center justify-center text-eln-primary">
+                          <Search className="h-4 w-4" />
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">#{order.id.slice(0, 8)}</span>
-                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
-                              order.status === OrderStatus.DELIVERED ? 'bg-emerald-100 text-emerald-600' : 
-                              order.status === OrderStatus.PENDING ? 'bg-amber-100 text-amber-600' :
-                              'bg-blue-100 text-blue-600'
-                            }`}>
-                              {order.status}
-                            </span>
-                          </div>
-                          <h3 className="text-2xl font-black text-slate-900 truncate mb-3">{order.customerName}</h3>
-                          <div className="flex flex-wrap items-center gap-y-2 gap-x-6">
-                            <div className="flex items-center text-xs text-gray-500 font-medium">
-                              <MapPin className="h-4 w-4 mr-2 text-slate-300" />
-                              <span className="truncate max-w-[200px]">{order.deliveryAddress}</span>
-                            </div>
-                            {order.riderName && (
-                              <button 
-                                onClick={() => order.riderId && handleViewRiderProfile(order.riderId)} 
-                                className="flex items-center text-xs font-black text-slate-400 hover:text-eln-primary transition-colors"
-                              >
-                                <Bike className="h-4 w-4 mr-2" />
-                                <span>{order.riderName}</span>
-                              </button>
-                            )}
-                            <div className="flex items-center text-xs text-gray-400 font-medium">
-                              <Clock className="h-4 w-4 mr-2 text-slate-300" />
-                              <span>{new Date(order.createdAt).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                        </div>
+                        <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Track a Mission</h3>
                       </div>
-                      
-                      <div className="flex items-center justify-between lg:justify-end lg:space-x-10 border-t lg:border-t-0 pt-6 lg:pt-0 border-gray-50">
-                        <div className="text-left lg:text-right">
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Delivery Fee</p>
-                          <p className="text-2xl font-black text-slate-900">₦{order.deliveryFee?.toLocaleString()}</p>
-                        </div>
-                        <button className="p-4 bg-slate-50 text-slate-400 rounded-2xl hover:bg-eln-primary hover:text-white transition-all shadow-sm">
-                          <History className="h-5 w-5" />
+                      <form onSubmit={handleTrackOrder} className="space-y-3">
+                        <input 
+                          type="text" 
+                          placeholder="Enter Tracking ID..." 
+                          value={trackingId}
+                          onChange={e => setTrackingId(e.target.value)}
+                          className="w-full p-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-eln-primary font-bold text-sm text-gray-900"
+                        />
+                        <button type="submit" className="w-full py-4 bg-eln-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-eln-primary/20 hover:bg-eln-primary/90 transition-all">
+                          Locate Order
                         </button>
-                      </div>
+                      </form>
                     </div>
-                  ))
-                ) : (
-                  <div className="bg-white p-24 rounded-[4xl] border border-dashed border-gray-200 text-center space-y-6">
-                    <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
-                      <Package className="h-12 w-12 text-gray-200" />
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-gray-900 text-2xl font-black">No missions yet</p>
-                      <p className="text-gray-400 font-medium text-sm max-w-xs mx-auto">Your delivery history will appear here once you start dispatching luxury items.</p>
-                    </div>
-                    <button 
-                      onClick={() => setActiveTab('request')}
-                      className="px-8 py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 hover:scale-105 transition-all"
-                    >
-                      Start First Mission
-                    </button>
+
+                    {trackedOrder && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="pt-6 border-t border-gray-50 space-y-6"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Status</p>
+                            <p className="text-sm font-black text-eln-primary">{trackedOrder.status}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">ID</p>
+                            <p className="text-sm font-black text-slate-900">#{trackedOrder.id.slice(0, 6)}</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          {[
+                            { status: OrderStatus.PICKED_UP, label: 'Pickup' },
+                            { status: OrderStatus.IN_TRANSIT, label: 'Transit' },
+                            { status: OrderStatus.OUT_FOR_DELIVERY, label: 'Out for Delivery' },
+                            { status: OrderStatus.DELIVERED, label: 'Delivered' }
+                          ].map((stage, i) => {
+                            const stages = [OrderStatus.PICKED_UP, OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED];
+                            const currentIdx = stages.indexOf(trackedOrder.status as OrderStatus);
+                            const isCompleted = currentIdx >= i;
+                            const isActive = trackedOrder.status === stage.status;
+                            
+                            return (
+                              <div key={i} className="flex items-center space-x-4">
+                                <div className="relative flex flex-col items-center">
+                                  <div className={`h-6 w-6 rounded-full flex items-center justify-center border-2 transition-all duration-500 z-10 ${
+                                    isCompleted ? 'bg-eln-primary border-eln-primary text-white shadow-sm' : 'bg-white border-gray-100 text-gray-200'
+                                  }`}>
+                                    {isCompleted ? <Check className="h-3 w-3" /> : <div className="h-1.5 w-1.5 rounded-full bg-gray-200" />}
+                                  </div>
+                                  {i < 3 && (
+                                    <div className={`w-0.5 h-6 -mb-6 mt-0 ${currentIdx > i ? 'bg-eln-primary' : 'bg-gray-100'}`} />
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <p className={`text-[10px] font-black uppercase tracking-widest ${isCompleted ? 'text-slate-900' : 'text-gray-300'}`}>{stage.label}</p>
+                                  {isActive && <p className="text-[8px] font-black text-eln-primary uppercase tracking-widest animate-pulse">Current Location</p>}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
-                )}
+                </div>
+
+                {/* History List Section */}
+                <div className="lg:col-span-8 space-y-4">
+                  {orders.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4">
+                      {orders.map(order => (
+                        <motion.div 
+                          key={order.id} 
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group transition-all hover:border-eln-primary/20 hover:shadow-lg hover:shadow-black/5"
+                        >
+                          <div className="flex items-center space-x-4 flex-1 min-w-0">
+                            <div className={`h-12 w-12 rounded-2xl flex-shrink-0 flex items-center justify-center ${order.status === OrderStatus.DELIVERED ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400 group-hover:bg-eln-primary/5 group-hover:text-eln-primary transition-colors'}`}>
+                              <Package className="h-6 w-6" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">#{order.id.slice(0, 6)}</span>
+                                <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                                  order.status === OrderStatus.DELIVERED ? 'bg-emerald-100 text-emerald-600' : 
+                                  order.status === OrderStatus.PENDING ? 'bg-amber-100 text-amber-600' :
+                                  'bg-blue-100 text-blue-600'
+                                }`}>
+                                  {order.status}
+                                </span>
+                              </div>
+                              <h3 className="text-base font-black text-slate-900 truncate">{order.customerName}</h3>
+                              <div className="flex flex-wrap items-center gap-x-4 mt-1">
+                                <div className="flex items-center text-[10px] text-gray-400 font-bold">
+                                  <MapPin className="h-3 w-3 mr-1 text-slate-300" />
+                                  <span className="truncate max-w-[150px]">{order.deliveryAddress}</span>
+                                </div>
+                                <div className="flex items-center text-[10px] text-gray-400 font-bold">
+                                  <Clock className="h-3 w-3 mr-1 text-slate-300" />
+                                  <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center justify-between sm:justify-end sm:space-x-6 border-t sm:border-t-0 pt-4 sm:pt-0 border-gray-50">
+                            <div className="text-left sm:text-right">
+                              <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Fee</p>
+                              <p className="text-lg font-black text-slate-900">₦{order.deliveryFee?.toLocaleString()}</p>
+                            </div>
+                            <div className="flex space-x-2">
+                              {order.riderId && (
+                                <button 
+                                  onClick={() => order.riderId && handleViewRiderProfile(order.riderId)}
+                                  className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-eln-primary/10 hover:text-eln-primary transition-all"
+                                  title="View Rider"
+                                >
+                                  <Bike className="h-4 w-4" />
+                                </button>
+                              )}
+                              <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-eln-primary hover:text-white transition-all shadow-sm">
+                                <History className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="bg-white p-16 rounded-[3rem] border border-dashed border-gray-200 text-center space-y-6">
+                      <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
+                        <Package className="h-10 w-10 text-gray-200" />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-gray-900 text-xl font-black">No missions yet</p>
+                        <p className="text-gray-400 font-medium text-xs max-w-xs mx-auto">Your delivery history will appear here once you start dispatching luxury items.</p>
+                      </div>
+                      <button 
+                        onClick={() => setActiveTab('request')}
+                        className="px-8 py-4 bg-eln-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 hover:scale-105 transition-all"
+                      >
+                        Start First Mission
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ) : (

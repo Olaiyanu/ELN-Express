@@ -76,7 +76,7 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     const pending = all.filter(o => o.status === OrderStatus.PENDING);
     setAllPendingOrders(pending);
     
-    const active = riderJobs.find(o => o.status === OrderStatus.IN_TRANSIT);
+    const active = riderJobs.find(o => [OrderStatus.ASSIGNED, OrderStatus.PICKED_UP, OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY].includes(o.status));
     const assigned = riderJobs.filter(o => o.status === OrderStatus.ASSIGNED);
     
     setActiveOrder(active || null);
@@ -153,7 +153,7 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
       alert('Your account must be verified before you can accept delivery missions.');
       return;
     }
-    mockDb.updateOrderStatus(orderId, OrderStatus.IN_TRANSIT, user.uid, user.name);
+    mockDb.updateOrderStatus(orderId, OrderStatus.ASSIGNED, user.uid, user.name);
     fetchOrders();
   };
 
@@ -530,7 +530,7 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
                     {activeOrder ? (
                       <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-8 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-6">
-                           <span className="text-[9px] bg-eln-primary/10 text-eln-primary px-3 py-1 rounded-lg font-black uppercase tracking-widest border border-eln-primary/20">In Transit</span>
+                           <span className="text-[9px] bg-eln-primary/10 text-eln-primary px-3 py-1 rounded-lg font-black uppercase tracking-widest border border-eln-primary/20">{activeOrder.status}</span>
                         </div>
                         <div className="flex items-center space-x-4">
                            <div className="bg-eln-primary/5 p-3 rounded-2xl text-eln-primary"><Package className="h-6 w-6" /></div>
@@ -585,13 +585,46 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
                                <Navigation className="h-4 w-4" />
                                <span>Open Navigation</span>
                              </button>
-                             <button 
-                                onClick={() => updateStatus(activeOrder.id, OrderStatus.DELIVERED)} 
-                                className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-600/20 flex items-center justify-center space-x-2 active:scale-95 transition-all"
-                             >
-                               <CheckCircle2 className="h-4 w-4" />
-                               <span>Confirm Successful Delivery</span>
-                             </button>
+                             
+                             {activeOrder.status === OrderStatus.ASSIGNED && (
+                               <button 
+                                  onClick={() => updateStatus(activeOrder.id, OrderStatus.PICKED_UP)} 
+                                  className="w-full py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-2 active:scale-95 transition-all"
+                               >
+                                 <Check className="h-4 w-4" />
+                                 <span>Mark as Picked Up</span>
+                               </button>
+                             )}
+
+                             {activeOrder.status === OrderStatus.PICKED_UP && (
+                               <button 
+                                  onClick={() => updateStatus(activeOrder.id, OrderStatus.IN_TRANSIT)} 
+                                  className="w-full py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-2 active:scale-95 transition-all"
+                               >
+                                 <RefreshCw className="h-4 w-4" />
+                                 <span>Start Transit</span>
+                               </button>
+                             )}
+
+                             {activeOrder.status === OrderStatus.IN_TRANSIT && (
+                               <button 
+                                  onClick={() => updateStatus(activeOrder.id, OrderStatus.OUT_FOR_DELIVERY)} 
+                                  className="w-full py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-2 active:scale-95 transition-all"
+                               >
+                                 <Bike className="h-4 w-4" />
+                                 <span>Out for Delivery</span>
+                               </button>
+                             )}
+
+                             {activeOrder.status === OrderStatus.OUT_FOR_DELIVERY && (
+                               <button 
+                                  onClick={() => updateStatus(activeOrder.id, OrderStatus.DELIVERED)} 
+                                  className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-600/20 flex items-center justify-center space-x-2 active:scale-95 transition-all"
+                               >
+                                 <CheckCircle2 className="h-4 w-4" />
+                                 <span>Confirm Successful Delivery</span>
+                               </button>
+                             )}
                            </div>
                         </div>
                       </div>

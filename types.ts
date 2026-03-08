@@ -8,7 +8,9 @@ export enum UserRole {
 export enum OrderStatus {
   PENDING = 'Pending',
   ASSIGNED = 'Assigned',
-  IN_TRANSIT = 'In Transit',
+  PICKED_UP = 'Order Pickup',
+  IN_TRANSIT = 'Transit',
+  OUT_FOR_DELIVERY = 'Out for Delivery',
   DELIVERED = 'Delivered',
   CANCELLED = 'Cancelled'
 }
