@@ -32,7 +32,8 @@ import {
   Trash2,
   Settings,
   AlertTriangle,
-  Gavel
+  Gavel,
+  Wallet
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Logo from '../components/Logo';
@@ -113,6 +114,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }) => {
         <NavItem to="/admin-dashboard/orders" icon={Package} label="Delivery Management" />
         <NavItem to="/admin-dashboard/controls" icon={ShieldCheck} label="Rider & Merchant Control" badgeCount={pendingVerifications} />
         <NavItem to="/admin-dashboard/pricing" icon={Banknote} label="Pricing Rules" />
+        <NavItem to="/admin-dashboard/withdrawals" icon={Wallet} label="Withdrawals" badgeCount={mockDb.getWithdrawals().filter(w => w.status === 'pending').length} />
         <NavItem to="/admin-dashboard/reports" icon={BarChart3} label="Reporting" />
         <NavItem to="/admin-dashboard/disputes" icon={Gavel} label="Dispute Handling" badgeCount={pendingDisputes} />
       </nav>
@@ -191,6 +193,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }) => {
             <Route path="orders" element={<AdminOrders />} />
             <Route path="controls" element={<AdminControls />} />
             <Route path="pricing" element={<AdminPricingRules />} />
+            <Route path="withdrawals" element={<AdminWithdrawals />} />
             <Route path="reports" element={<AdminReports />} />
             <Route path="disputes" element={<AdminDisputes />} />
             <Route path="/" element={<AdminOverview />} />
@@ -694,6 +697,107 @@ const AdminPricingRules = () => {
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+const AdminWithdrawals = () => {
+  const [withdrawals, setWithdrawals] = useState(mockDb.getWithdrawals());
+  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+
+  const handleAction = (id: string, status: 'approved' | 'rejected') => {
+    mockDb.updateWithdrawalStatus(id, status);
+    setWithdrawals(mockDb.getWithdrawals());
+  };
+
+  const filteredWithdrawals = withdrawals.filter(w => filter === 'all' || w.status === filter);
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-black text-gray-900">Withdrawal Requests</h2>
+          <p className="text-sm text-gray-500 font-medium">Review and process rider payout requests.</p>
+        </div>
+        <div className="flex bg-white p-1 rounded-full shadow-sm border border-gray-100">
+          {['all', 'pending', 'approved', 'rejected'].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f as any)}
+              className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                filter === f ? 'bg-eln-primary text-white shadow-lg shadow-eln-primary/20' : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        {filteredWithdrawals.length > 0 ? (
+          filteredWithdrawals.sort((a, b) => b.createdAt - a.createdAt).map((w) => (
+            <div key={w.id} className="bg-white p-8 rounded-4xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-eln-primary/20 transition-all">
+              <div className="flex items-center space-x-6">
+                <div className={`p-4 rounded-2xl ${w.status === 'pending' ? 'bg-eln-primary/5 text-eln-primary' : w.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                  <Wallet className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2 mb-1">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Request #{w.id}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tight ${
+                      w.status === 'pending' ? 'bg-eln-primary/10 text-eln-primary' : 
+                      w.status === 'approved' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'
+                    }`}>
+                      {w.status}
+                    </span>
+                  </div>
+                  <h4 className="text-lg font-black text-eln-orange-deep">{w.riderName}</h4>
+                  <div className="flex items-center space-x-4 mt-2">
+                    <div className="flex items-center space-x-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      <Banknote className="h-3 w-3" />
+                      <span>{w.bankDetails.bankName} • {w.bankDetails.accountNumber}</span>
+                    </div>
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      {new Date(w.createdAt).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-6">
+                <div className="text-right">
+                  <p className="text-2xl font-black text-gray-900">₦{w.amount.toLocaleString()}</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{w.bankDetails.accountName}</p>
+                </div>
+                {w.status === 'pending' && (
+                  <div className="flex space-x-2">
+                    <button 
+                      onClick={() => handleAction(w.id, 'approved')}
+                      className="p-3 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-lg shadow-emerald-600/10"
+                    >
+                      <Check className="h-5 w-5" />
+                    </button>
+                    <button 
+                      onClick={() => handleAction(w.id, 'rejected')}
+                      className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-lg shadow-red-600/10"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="py-20 text-center bg-white rounded-4xl border border-dashed border-gray-200">
+            <div className="bg-gray-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Wallet className="h-8 w-8 text-gray-300" />
+            </div>
+            <p className="text-sm font-black text-gray-400 uppercase tracking-widest">No withdrawal requests found</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

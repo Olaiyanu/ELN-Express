@@ -16,6 +16,7 @@ import MerchantPolicyPage from './pages/MerchantPolicyPage';
 import RiderPolicyPage from './pages/RiderPolicyPage';
 import PaymentPage from './pages/PaymentPage';
 import GlobalBackground from './components/GlobalBackground';
+import ScrollToTop from './components/ScrollToTop';
 
 // Simple Auth Provider Logic
 const App: React.FC = () => {
@@ -56,6 +57,7 @@ const App: React.FC = () => {
 
   return (
     <HashRouter>
+      <ScrollToTop />
       <GlobalBackground />
       <Routes>
         {/* Public Routes */}

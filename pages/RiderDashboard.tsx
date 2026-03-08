@@ -58,6 +58,14 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
   });
   const [verificationInput, setVerificationInput] = useState('');
   const [verificationError, setVerificationError] = useState(false);
+  const [showWithdrawalModal, setShowWithdrawalModal] = useState(false);
+  const [isSubmittingWithdrawal, setIsSubmittingWithdrawal] = useState(false);
+  const [withdrawalForm, setWithdrawalForm] = useState({
+    amount: '',
+    accountNumber: localUser.bankDetails?.accountNumber || '',
+    bankName: localUser.bankDetails?.bankName || '',
+    accountName: localUser.bankDetails?.accountName || ''
+  });
   const navigate = useNavigate();
 
   const fetchOrders = () => {
@@ -280,6 +288,59 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     setVerificationInput('');
     setVerificationError(false);
     fetchOrders();
+  };
+
+  const handleWithdrawalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const amountNum = parseFloat(withdrawalForm.amount);
+    
+    if (isNaN(amountNum) || amountNum <= 0) {
+      alert('Please enter a valid amount.');
+      return;
+    }
+    
+    if (amountNum > (localUser.walletBalance || 0)) {
+      alert('Insufficient balance.');
+      return;
+    }
+
+    if (!withdrawalForm.accountNumber || !withdrawalForm.bankName || !withdrawalForm.accountName) {
+      alert('Please fill in all bank details.');
+      return;
+    }
+
+    setIsSubmittingWithdrawal(true);
+    
+    setTimeout(() => {
+      const request = {
+        id: Math.random().toString(36).substring(2, 11),
+        riderId: localUser.uid,
+        riderName: localUser.name,
+        amount: amountNum,
+        bankDetails: {
+          accountNumber: withdrawalForm.accountNumber,
+          bankName: withdrawalForm.bankName,
+          accountName: withdrawalForm.accountName
+        },
+        status: 'pending' as const,
+        createdAt: Date.now()
+      };
+
+      mockDb.requestWithdrawal(request);
+      
+      // Update local user bank details for future use
+      const updatedUser = {
+        ...localUser,
+        bankDetails: request.bankDetails
+      };
+      mockDb.saveUser(updatedUser);
+      setLocalUser(updatedUser);
+
+      setIsSubmittingWithdrawal(false);
+      setShowWithdrawalModal(false);
+      setWithdrawalForm({ ...withdrawalForm, amount: '' });
+      alert('Withdrawal request submitted successfully! Admin will review it shortly.');
+    }, 1500);
   };
 
   const SidebarContent = () => (
@@ -659,7 +720,12 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
                 <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-8">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight">Payout History</h3>
-                    <button className="text-[10px] font-black text-eln-primary uppercase tracking-widest hover:underline">Request Withdrawal</button>
+                    <button 
+                      onClick={() => setShowWithdrawalModal(true)}
+                      className="text-[10px] font-black text-eln-primary uppercase tracking-widest hover:underline"
+                    >
+                      Request Withdrawal
+                    </button>
                   </div>
                   
                   <div className="space-y-4">
@@ -802,6 +868,91 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
                   className="w-full py-5 bg-eln-primary text-white font-black rounded-2xl shadow-2xl shadow-eln-primary/40 uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                 >
                   {isSavingProfile ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : 'Save Changes'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {showWithdrawalModal && (
+          <div className="fixed inset-0 bg-eln-orange-deep/60 backdrop-blur-lg z-[120] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-8 sm:p-12 space-y-8"
+            >
+              <div className="flex justify-between items-center">
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-black text-eln-orange-deep">Withdraw Funds</h3>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Available: ₦{(localUser.walletBalance || 0).toLocaleString()}</p>
+                </div>
+                <button onClick={() => setShowWithdrawalModal(false)} className="p-3 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors">
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleWithdrawalSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Amount (₦)</label>
+                    <input 
+                      required 
+                      type="number" 
+                      placeholder="0.00"
+                      value={withdrawalForm.amount} 
+                      onChange={e => setWithdrawalForm({...withdrawalForm, amount: e.target.value})} 
+                      className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" 
+                    />
+                  </div>
+                  
+                  <div className="pt-4 border-t border-gray-100">
+                    <p className="text-[10px] font-black uppercase text-eln-primary tracking-widest mb-4">Bank Details</p>
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Bank Name</label>
+                        <input 
+                          required 
+                          type="text" 
+                          placeholder="e.g. GTBank"
+                          value={withdrawalForm.bankName} 
+                          onChange={e => setWithdrawalForm({...withdrawalForm, bankName: e.target.value})} 
+                          className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" 
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Account Number</label>
+                        <input 
+                          required 
+                          type="text" 
+                          placeholder="10 digits"
+                          maxLength={10}
+                          value={withdrawalForm.accountNumber} 
+                          onChange={e => setWithdrawalForm({...withdrawalForm, accountNumber: e.target.value})} 
+                          className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" 
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Account Name</label>
+                        <input 
+                          required 
+                          type="text" 
+                          placeholder="Full Name on Account"
+                          value={withdrawalForm.accountName} 
+                          onChange={e => setWithdrawalForm({...withdrawalForm, accountName: e.target.value})} 
+                          className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={isSubmittingWithdrawal}
+                  className="w-full py-5 bg-eln-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-3 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                >
+                  {isSubmittingWithdrawal ? <Loader2 className="h-5 w-5 animate-spin" /> : <span>Submit Withdrawal Request</span>}
                 </button>
               </form>
             </motion.div>

@@ -352,18 +352,7 @@ const LandingPage: React.FC = () => {
               className="w-full sm:w-auto"
             >
               <Link to="/login" className="w-full px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center hover:bg-white/10 transition-all">
-                Merchant Login
-              </Link>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 3.6 }}
-              className="w-full sm:w-auto"
-            >
-              <Link to="/login" className="w-full px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center hover:bg-white/10 transition-all">
-                Rider Login
+                Merchant or Rider Login
               </Link>
             </motion.div>
           </div>
