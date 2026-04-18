@@ -396,8 +396,12 @@ const AdminOrders = () => {
                   <td className="px-8 py-5 font-black text-eln-primary">#{order.id.slice(0, 6)}</td>
                   <td className="px-8 py-5 font-black text-eln-orange-deep">{order.merchantName}</td>
                   <td className="px-8 py-5">
-                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tight ${
-                      order.status === OrderStatus.DELIVERED ? 'bg-green-50 text-green-600' : 'bg-eln-primary/5 text-eln-primary'
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                      order.status === OrderStatus.DELIVERED ? 'bg-emerald-100 text-emerald-600' : 
+                      order.status === OrderStatus.PENDING ? 'bg-amber-100 text-amber-600' :
+                      order.status === OrderStatus.ASSIGNED ? 'bg-blue-100 text-blue-600' :
+                      order.status === OrderStatus.ACCEPTED ? 'bg-indigo-100 text-indigo-600' :
+                      'bg-eln-primary text-white shadow-sm shadow-eln-primary/20'
                     }`}>
                       {order.status}
                     </span>

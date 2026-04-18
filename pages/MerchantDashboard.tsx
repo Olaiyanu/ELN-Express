@@ -143,8 +143,22 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
     };
     mockDb.saveOrder(order);
     
-    // Simulate sending email to customer
-    console.log(`[MOCK EMAIL] To: ${newOrder.customerEmail} | Message: Your delivery code is ${verificationCode}. Please provide this to the rider upon delivery.`);
+    // Simulate sending email/SMS to customer
+    const message = `Shipment Dispatch 🚚: Order #${order.id.slice(0, 6)} is ready. Your secure pickup code is [${verificationCode}]. Please provide this only to the ELN Rider at the point of delivery. Details: ${order.itemsDescription}`;
+    
+    console.log(`%c[SMS/EMAIL SENT] To: ${newOrder.customerPhone || newOrder.customerEmail}`, 'background: #FF7A00; color: #fff; padding: 4px; border-radius: 4px;');
+    console.log(`Content: ${message}`);
+
+    // Add a local notification to merchant's own dashboard for confirmation
+    mockDb.addNotification({
+      id: Math.random().toString(36).substring(2, 11),
+      userId: user.uid,
+      title: 'Order Dispatched',
+      message: `Order #${order.id.slice(0, 6)} created. Secure code ${verificationCode} sent to ${newOrder.customerName}.`,
+      type: 'system',
+      read: false,
+      createdAt: Date.now()
+    });
     
     refreshOrders();
     setShowCreateModal(false);
@@ -209,14 +223,37 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
 
   const handleTrackOrder = (e: React.FormEvent) => {
     e.preventDefault();
-    const order = orders.find(o => o.id === trackingId.toUpperCase());
+    if (!trackingId.trim()) return;
+
+    const allOrders = mockDb.getOrders();
+    // Normalize tracking ID: remove '#' or 'ELN-' prefix
+    const cleanId = trackingId.trim().replace(/^#/, '').replace(/^ELN-/, '').toUpperCase();
+    
+    // Find the order searching for exact ID or the first 6-8 chars (since we often show slice)
+    const order = allOrders.find(o => 
+      o.id.toUpperCase() === cleanId || 
+      o.id.toUpperCase().startsWith(cleanId)
+    );
+    
     if (order) {
       setTrackedOrder(order);
+      // If it's the merchant's own order, it will be in the list, but we search globally for better UX
     } else {
-      alert('Order not found. Please check the ID.');
+      alert('Mission not found. Please verify the Tracking ID.');
       setTrackedOrder(null);
     }
   };
+
+  // Sync tracked order with latest database changes
+  useEffect(() => {
+    if (trackedOrder) {
+      const all = mockDb.getOrders();
+      const updated = all.find(o => o.id === trackedOrder.id);
+      if (updated && JSON.stringify(updated) !== JSON.stringify(trackedOrder)) {
+        setTrackedOrder(updated);
+      }
+    }
+  }, [orders]);
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full py-8 px-4">
@@ -403,20 +440,30 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Status</p>
                             <p className="text-sm font-black text-eln-primary">{trackedOrder.status}</p>
                           </div>
-                          <div className="text-right">
+                          <div className="text-right flex flex-col items-end">
                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">ID</p>
-                            <p className="text-sm font-black text-slate-900">#{trackedOrder.id.slice(0, 6)}</p>
+                            <div className="flex items-center space-x-2">
+                              <p className="text-sm font-black text-slate-900">#{trackedOrder.id.slice(0, 6)}</p>
+                              <button 
+                                onClick={() => setTrackedOrder(null)}
+                                className="p-1 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors"
+                                title="Clear Tracking"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
                           </div>
                         </div>
 
                         <div className="space-y-4">
                           {[
+                            { status: OrderStatus.ACCEPTED, label: 'Accepted' },
                             { status: OrderStatus.PICKED_UP, label: 'Pickup' },
                             { status: OrderStatus.IN_TRANSIT, label: 'Transit' },
                             { status: OrderStatus.OUT_FOR_DELIVERY, label: 'Out for Delivery' },
                             { status: OrderStatus.DELIVERED, label: 'Delivered' }
                           ].map((stage, i) => {
-                            const stages = [OrderStatus.PICKED_UP, OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED];
+                            const stages = [OrderStatus.ACCEPTED, OrderStatus.PICKED_UP, OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED];
                             const currentIdx = stages.indexOf(trackedOrder.status as OrderStatus);
                             const isCompleted = currentIdx >= i;
                             const isActive = trackedOrder.status === stage.status;
@@ -429,7 +476,7 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                                   }`}>
                                     {isCompleted ? <Check className="h-3 w-3" /> : <div className="h-1.5 w-1.5 rounded-full bg-gray-200" />}
                                   </div>
-                                  {i < 3 && (
+                                  {i < 4 && (
                                     <div className={`w-0.5 h-6 -mb-6 mt-0 ${currentIdx > i ? 'bg-eln-primary' : 'bg-gray-100'}`} />
                                   )}
                                 </div>
@@ -477,6 +524,19 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                                 <div className="flex items-center text-[10px] text-gray-400 font-bold">
                                   <MapPin className="h-3 w-3 mr-1 text-slate-300" />
                                   <span className="truncate max-w-[150px]">{order.deliveryAddress}</span>
+                                </div>
+                                <div className={`flex items-center text-[10px] font-black uppercase tracking-widest ${order.status === OrderStatus.DELIVERED ? 'text-emerald-600' : 'text-eln-primary'}`}>
+                                  {order.status === OrderStatus.DELIVERED ? (
+                                    <>
+                                      <Check className="h-3 w-3 mr-1" />
+                                      <span>Verified Delivery</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                                      <span>Code: {order.verificationCode}</span>
+                                    </>
+                                  )}
                                 </div>
                                 <div className="flex items-center text-[10px] text-gray-400 font-bold">
                                   <Clock className="h-3 w-3 mr-1 text-slate-300" />
@@ -622,33 +682,44 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                         <X className="h-6 w-6" />
                       </button>
                     </div>
-              <form onSubmit={handleCreateOrder} className="space-y-6">
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Customer Name</label>
-                      <div className="relative">
-                         <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
-                         <input required type="text" value={newOrder.customerName} onChange={e => setNewOrder({...newOrder, customerName: e.target.value})} placeholder="e.g. Linda Evangelista" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
-                      </div>
+              <form onSubmit={handleCreateOrder} className="space-y-8">
+                 <div className="space-y-4">
+                    <h4 className="text-[10px] font-black uppercase text-eln-primary tracking-widest flex items-center space-x-2">
+                      <UserIcon className="h-3 w-3" />
+                      <span>Customer Details</span>
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <div className="space-y-1">
+                         <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Full Name</label>
+                         <div className="relative">
+                            <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+                            <input required type="text" value={newOrder.customerName} onChange={e => setNewOrder({...newOrder, customerName: e.target.value})} placeholder="e.g. Linda Evangelista" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
+                         </div>
+                       </div>
+                       <div className="space-y-1">
+                         <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Phone Number</label>
+                         <div className="relative">
+                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+                            <input required type="tel" value={newOrder.customerPhone} onChange={e => setNewOrder({...newOrder, customerPhone: e.target.value})} placeholder="+234 800 000 0000" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
+                         </div>
+                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Phone</label>
-                      <div className="relative">
-                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
-                         <input required type="tel" value={newOrder.customerPhone} onChange={e => setNewOrder({...newOrder, customerPhone: e.target.value})} placeholder="+234 800 000 0000" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
-                      </div>
-                    </div>
-                 </div>
 
-                 <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Customer Email</label>
-                    <div className="relative">
-                       <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
-                       <input required type="email" value={newOrder.customerEmail} onChange={e => setNewOrder({...newOrder, customerEmail: e.target.value})} placeholder="customer@example.com" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
+                    <div className="space-y-1">
+                       <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Email Address</label>
+                       <div className="relative">
+                          <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+                          <input required type="email" value={newOrder.customerEmail} onChange={e => setNewOrder({...newOrder, customerEmail: e.target.value})} placeholder="customer@example.com" className="w-full pl-11 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary font-bold text-gray-900" />
+                       </div>
                     </div>
                  </div>
                  
-                 <div className="space-y-1 relative">
+                 <div className="space-y-4">
+                    <h4 className="text-[10px] font-black uppercase text-eln-primary tracking-widest flex items-center space-x-2">
+                      <MapPin className="h-3 w-3" />
+                      <span>Delivery Details</span>
+                    </h4>
+                    <div className="space-y-1 relative">
                     <div className="flex justify-between items-center mb-1">
                       <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Delivery Address</label>
                       {isVerified && <span className="text-[9px] font-black uppercase text-green-600">Verified Address</span>}
@@ -665,10 +736,17 @@ const MerchantDashboard: React.FC<MerchantDashboardProps> = ({ user, onLogout })
                       </div>
                     )}
                  </div>
+                 </div>
 
-                 <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Package Description</label>
-                    <textarea value={newOrder.itemsDescription} onChange={e => setNewOrder({...newOrder, itemsDescription: e.target.value})} placeholder="e.g. 2 Evening Gowns" className="w-full p-5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary h-24 font-bold text-gray-900 resize-none"></textarea>
+                 <div className="space-y-4">
+                    <h4 className="text-[10px] font-black uppercase text-eln-primary tracking-widest flex items-center space-x-2">
+                      <Package className="h-3 w-3" />
+                      <span>Package Details</span>
+                    </h4>
+                    <div className="space-y-1">
+                       <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Description</label>
+                       <textarea value={newOrder.itemsDescription} onChange={e => setNewOrder({...newOrder, itemsDescription: e.target.value})} placeholder="e.g. 2 Evening Gowns" className="w-full p-5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-eln-primary h-24 font-bold text-gray-900 resize-none"></textarea>
+                    </div>
                  </div>
                  <button type="submit" className="w-full py-5 bg-eln-primary text-white font-black rounded-2xl shadow-2xl shadow-eln-primary/40 uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all">
                    Request Dispatch

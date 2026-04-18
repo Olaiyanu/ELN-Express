@@ -13,6 +13,7 @@ import {
   Menu, 
   Check,
   Ban,
+  Phone,
   Power,
   ToggleLeft,
   ToggleRight,
@@ -41,7 +42,9 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
   const common = translations.common;
 
   const [orders, setOrders] = useState<Order[]>([]);
-  const [activeOrder, setActiveOrder] = useState<Order | null>(null);
+  const [activeOrders, setActiveOrders] = useState<Order[]>([]);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const activeOrder = activeOrders.find(o => o.id === selectedOrderId);
   const [newRequests, setNewRequests] = useState<Order[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'jobs' | 'map' | 'earnings'>('jobs');
@@ -76,10 +79,10 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     const pending = all.filter(o => o.status === OrderStatus.PENDING);
     setAllPendingOrders(pending);
     
-    const active = riderJobs.find(o => [OrderStatus.ASSIGNED, OrderStatus.PICKED_UP, OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY].includes(o.status));
+    const active = riderJobs.filter(o => [OrderStatus.ACCEPTED, OrderStatus.PICKED_UP, OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY].includes(o.status));
     const assigned = riderJobs.filter(o => o.status === OrderStatus.ASSIGNED);
     
-    setActiveOrder(active || null);
+    setActiveOrders(active);
     setNewRequests(assigned);
   };
 
@@ -111,6 +114,12 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
   }, [user.uid]);
 
   const handleToggleAvailability = () => {
+    // If trying to go online, check for verification
+    if (!localUser.isAvailable && localUser.verificationStatus !== VerificationStatus.VERIFIED) {
+      alert('Verification required. Please complete your profile verification to start receiving missions.');
+      return;
+    }
+
     const newStatus = !localUser.isAvailable;
     const updatedUser = { ...localUser, isAvailable: newStatus };
     setLocalUser(updatedUser);
@@ -153,8 +162,9 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
       alert('Your account must be verified before you can accept delivery missions.');
       return;
     }
-    mockDb.updateOrderStatus(orderId, OrderStatus.ASSIGNED, user.uid, user.name);
+    mockDb.updateOrderStatus(orderId, OrderStatus.ACCEPTED, user.uid, user.name);
     fetchOrders();
+    setSelectedOrderId(orderId);
   };
 
   const isVerified = localUser.verificationStatus === VerificationStatus.VERIFIED;
@@ -278,8 +288,9 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
   };
 
   const updateStatus = (orderId: string, status: OrderStatus) => {
-    if (status === OrderStatus.DELIVERED && activeOrder) {
-      if (verificationInput.toUpperCase() !== activeOrder.verificationCode) {
+    const orderToUpdate = activeOrders.find(o => o.id === orderId);
+    if (status === OrderStatus.DELIVERED && orderToUpdate) {
+      if (verificationInput.toUpperCase() !== orderToUpdate.verificationCode) {
         setVerificationError(true);
         return;
       }
@@ -288,6 +299,9 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
     setVerificationInput('');
     setVerificationError(false);
     fetchOrders();
+    if (status === OrderStatus.DELIVERED) {
+      setSelectedOrderId(null);
+    }
   };
 
   const handleWithdrawalSubmit = (e: React.FormEvent) => {
@@ -389,16 +403,6 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
               <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Professional Rider</p>
             </div>
           </button>
-          <button 
-            onClick={handleToggleAvailability}
-            className={`flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all ${localUser.isAvailable ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-white/30'}`}
-          >
-            <div className="flex items-center space-x-2">
-              <Power className="h-4 w-4" />
-              <span className="font-black text-[10px] uppercase tracking-widest">{localUser.isAvailable ? 'Online' : 'Offline'}</span>
-            </div>
-            {localUser.isAvailable ? <ToggleRight className="h-5 w-5" /> : <ToggleLeft className="h-5 w-5" />}
-          </button>
         </div>
         <button onClick={onLogout} className="flex items-center space-x-3 w-full px-5 py-4 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-all">
           <LogOut className="h-5 w-5" />
@@ -454,39 +458,61 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
       </aside>
 
       <main className="flex-1 flex flex-col h-screen overflow-y-auto w-full">
-        <header className="bg-eln-bg px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-30 border-b border-gray-100">
-          <div className="flex items-center space-x-4">
+        <header className="bg-eln-bg px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-30 border-b border-gray-100 h-16 sm:h-20">
+          <div className="flex items-center space-x-3 sm:space-x-5 min-w-0">
             {isVerified && (
-              <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-400 lg:hidden hover:bg-gray-50 rounded-xl transition-colors">
-                <Menu className="h-6 w-6" />
+              <button 
+                onClick={() => setIsMobileMenuOpen(true)} 
+                className="p-2 text-gray-400 lg:hidden hover:bg-gray-50 rounded-xl transition-all active:scale-95 flex-shrink-0 border border-transparent hover:border-gray-100"
+              >
+                <Menu className="h-5 w-5" />
               </button>
             )}
-            <h1 className="font-black text-xs uppercase tracking-[0.2em] text-gray-400">
-              Rider Dashboard <span className="text-gray-200 mx-2">/</span> <span className="text-slate-900">{isVerified ? activeTab : 'Verification'}</span>
+            <h1 className="font-black text-[10px] sm:text-xs uppercase tracking-[0.2em] text-gray-400 flex items-center min-w-0 overflow-hidden">
+              <span className="hidden xs:inline whitespace-nowrap">Rider Dashboard</span> 
+              <span className="xs:hidden">Dashboard</span> 
+              <span className="text-gray-200 mx-2 flex-shrink-0">/</span> 
+              <span className="text-slate-900 truncate font-black">{isVerified ? activeTab : 'Verification'}</span>
             </h1>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 ml-4 flex-shrink-0">
             {isVerified && (
-              <div className="hidden sm:flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
-                <span className={`text-[10px] font-black uppercase tracking-widest ${localUser.isAvailable ? 'text-green-600' : 'text-gray-400'}`}>
-                  {localUser.isAvailable ? 'Available' : 'Offline'}
-                </span>
-                <button onClick={handleToggleAvailability} className="focus:outline-none">
-                  {localUser.isAvailable ? <ToggleRight className="h-6 w-6 text-eln-primary" /> : <ToggleLeft className="h-6 w-6 text-gray-300" />}
+              <div className={`flex items-center space-x-2 sm:space-x-3 px-3 py-1.5 sm:py-2.5 rounded-xl border transition-all duration-300 ${
+                localUser.isAvailable 
+                  ? 'bg-green-50 border-green-100 text-green-600 shadow-sm' 
+                  : 'bg-gray-50 border-gray-100 text-gray-400'
+              }`}>
+                <div className="flex items-center space-x-2">
+                  <div className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${localUser.isAvailable ? 'bg-green-600 animate-pulse' : 'bg-gray-300'}`} />
+                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.1em] whitespace-nowrap hidden sm:inline">
+                    {localUser.isAvailable ? 'Online' : 'Offline'}
+                  </span>
+                </div>
+                <button 
+                  onClick={handleToggleAvailability} 
+                  className="focus:outline-none transition-all active:scale-90 flex-shrink-0"
+                  title={localUser.isAvailable ? "Go Offline" : "Go Online"}
+                >
+                  {localUser.isAvailable ? (
+                    <ToggleRight className="h-5 w-5 sm:h-6 sm:w-6 text-eln-primary" />
+                  ) : (
+                    <ToggleLeft className="h-5 w-5 sm:h-6 sm:w-6 text-gray-300" />
+                  )}
                 </button>
               </div>
             )}
-            {isVerified && <NotificationBell userId={user.uid} />}
-            <button onClick={fetchOrders} className="p-2 bg-gray-50 rounded-xl text-gray-400 hover:text-eln-primary hover:bg-eln-primary/5 transition-colors border border-gray-100">
-              <RefreshCw className="h-5 w-5" />
-            </button>
-            <button 
-              onClick={() => setShowProfileModal(true)}
-              className="h-10 w-10 rounded-xl bg-gray-50 overflow-hidden border border-gray-100 hover:ring-2 hover:ring-eln transition-all"
-            >
-              <img src={localUser.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(localUser.name)}&background=034287&color=fff`} alt="" className="h-full w-full object-cover" />
-            </button>
+            
+            <div className="flex items-center space-x-1.5 sm:space-x-3">
+              {isVerified && <NotificationBell userId={user.uid} />}
+              <button 
+                onClick={fetchOrders} 
+                className="p-2 bg-gray-50 rounded-xl text-gray-400 hover:text-eln-primary hover:bg-eln-primary/5 transition-all active:scale-95 border border-gray-100 flex-shrink-0"
+                title="Refresh"
+              >
+                <RefreshCw className="h-4 w-4 sm:h-5 w-5" />
+              </button>
+            </div>
           </div>
         </header>
 
@@ -523,118 +549,197 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Active Order Card */}
                   <div className="space-y-4">
-                    <h3 className="font-black text-eln-primary text-[10px] uppercase tracking-widest flex items-center space-x-2">
-                      <div className="h-1 w-1 rounded-full bg-eln-primary animate-pulse" />
-                      <span>Current Mission</span>
-                    </h3>
-                    {activeOrder ? (
-                      <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-8 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-6">
-                           <span className="text-[9px] bg-eln-primary/10 text-eln-primary px-3 py-1 rounded-lg font-black uppercase tracking-widest border border-eln-primary/20">{activeOrder.status}</span>
-                        </div>
-                        <div className="flex items-center space-x-4">
-                           <div className="bg-eln-primary/5 p-3 rounded-2xl text-eln-primary"><Package className="h-6 w-6" /></div>
-                           <div>
-                              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Merchant Partner</p>
-                              <p className="font-black text-xl text-slate-900">{activeOrder.merchantName}</p>
-                           </div>
-                        </div>
-                        <div className="space-y-6">
-                           <div className="bg-gray-50 p-6 rounded-3xl space-y-4 border border-gray-100">
-                              <div className="flex items-center space-x-3">
-                                 <MapPin className="h-4 w-4 text-eln-primary" />
-                                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Dropoff Destination</p>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-black text-eln-primary text-[10px] uppercase tracking-widest flex items-center space-x-2">
+                        <div className="h-1 w-1 rounded-full bg-eln-primary animate-pulse" />
+                        <span>{selectedOrderId ? 'Task Details' : `Active Logistics (${activeOrders.length})`}</span>
+                      </h3>
+                      {selectedOrderId && (
+                        <button 
+                          onClick={() => {
+                            setSelectedOrderId(null);
+                            setVerificationInput('');
+                            setVerificationError(false);
+                          }}
+                          className="text-[9px] font-black text-eln-primary uppercase tracking-widest bg-eln-primary/5 px-3 py-1.5 rounded-lg border border-eln-primary/10 hover:bg-eln-primary hover:text-white transition-all"
+                        >
+                          Back to List
+                        </button>
+                      )}
+                    </div>
+
+                    {!selectedOrderId ? (
+                      <div className="space-y-4">
+                        {activeOrders.length > 0 ? (
+                          activeOrders.map((order) => (
+                            <motion.div
+                              key={order.id}
+                              layoutId={order.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              onClick={() => setSelectedOrderId(order.id)}
+                              className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-eln-primary/20 transition-all cursor-pointer group"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4">
+                                  <div className="h-12 w-12 bg-eln-primary/5 rounded-2xl flex items-center justify-center text-eln-primary group-hover:bg-eln-primary group-hover:text-white transition-all">
+                                    <Package className="h-6 w-6" />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-black text-slate-900 text-sm">#{order.id.slice(0, 8)}</h4>
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{order.status}</span>
+                                      <div className="h-1 w-1 rounded-full bg-gray-300" />
+                                      <span className="text-[9px] font-bold text-eln-primary uppercase tracking-widest">{order.customerName}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <ArrowRight className="h-5 w-5 text-gray-300 group-hover:text-eln-primary group-hover:translate-x-1 transition-all" />
                               </div>
-                              <div>
-                                 <p className="font-black text-base text-gray-800 mb-1">{activeOrder.customerName}</p>
-                                 <p className="text-xs text-gray-500 font-medium leading-relaxed">{activeOrder.deliveryAddress}</p>
-                              </div>
-                           </div>
-
-                           <div className="bg-gray-50 p-6 rounded-3xl space-y-3 border border-gray-100">
-                              <div className="flex items-center space-x-3">
-                                 <Package className="h-4 w-4 text-eln-primary" />
-                                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Product Details</p>
-                              </div>
-                              <p className="text-sm font-bold text-gray-700">{activeOrder.itemsDescription || 'No description provided'}</p>
-                           </div>
-
-                           <div className="space-y-3">
-                              <div className="flex justify-between items-center">
-                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verification Code</p>
-                                 {verificationError && <span className="text-[9px] font-black text-red-500 uppercase">Invalid Code</span>}
-                              </div>
-                              <input 
-                                 type="text" 
-                                 value={verificationInput}
-                                 onChange={(e) => {
-                                   setVerificationInput(e.target.value);
-                                   setVerificationError(false);
-                                 }}
-                                 placeholder="Enter 5-digit code from customer"
-                                 className={`w-full p-4 bg-gray-50 border-2 rounded-2xl font-black text-center tracking-[0.5em] focus:ring-0 transition-all ${verificationError ? 'border-red-500 text-red-500' : 'border-gray-100 text-gray-900 focus:border-eln-primary'}`}
-                                 maxLength={5}
-                              />
-                           </div>
-                           
-                           <div className="flex flex-col space-y-3">
-                             <button 
-                                onClick={() => setActiveTab('map')}
-                                className="w-full py-4 bg-white border border-gray-100 text-gray-900 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center space-x-2 hover:bg-gray-50 transition-all shadow-sm"
-                             >
-                               <Navigation className="h-4 w-4" />
-                               <span>Open Navigation</span>
-                             </button>
-                             
-                             {activeOrder.status === OrderStatus.ASSIGNED && (
-                               <button 
-                                  onClick={() => updateStatus(activeOrder.id, OrderStatus.PICKED_UP)} 
-                                  className="w-full py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-2 active:scale-95 transition-all"
-                               >
-                                 <Check className="h-4 w-4" />
-                                 <span>Mark as Picked Up</span>
-                               </button>
-                             )}
-
-                             {activeOrder.status === OrderStatus.PICKED_UP && (
-                               <button 
-                                  onClick={() => updateStatus(activeOrder.id, OrderStatus.IN_TRANSIT)} 
-                                  className="w-full py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-2 active:scale-95 transition-all"
-                               >
-                                 <RefreshCw className="h-4 w-4" />
-                                 <span>Start Transit</span>
-                               </button>
-                             )}
-
-                             {activeOrder.status === OrderStatus.IN_TRANSIT && (
-                               <button 
-                                  onClick={() => updateStatus(activeOrder.id, OrderStatus.OUT_FOR_DELIVERY)} 
-                                  className="w-full py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-2 active:scale-95 transition-all"
-                               >
-                                 <Bike className="h-4 w-4" />
-                                 <span>Out for Delivery</span>
-                               </button>
-                             )}
-
-                             {activeOrder.status === OrderStatus.OUT_FOR_DELIVERY && (
-                               <button 
-                                  onClick={() => updateStatus(activeOrder.id, OrderStatus.DELIVERED)} 
-                                  className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-600/20 flex items-center justify-center space-x-2 active:scale-95 transition-all"
-                               >
-                                 <CheckCircle2 className="h-4 w-4" />
-                                 <span>Confirm Successful Delivery</span>
-                               </button>
-                             )}
-                           </div>
-                        </div>
+                            </motion.div>
+                          ))
+                        ) : (
+                          <div className="bg-white p-12 rounded-[2.5rem] text-center space-y-4 border border-dashed border-gray-200 shadow-sm">
+                            <div className="bg-gray-50 w-16 h-16 rounded-2xl flex items-center justify-center text-gray-300 mx-auto opacity-50">
+                              <Bike className="h-8 w-8" />
+                            </div>
+                            <p className="text-xs text-gray-400 font-black uppercase tracking-widest">No active deliveries</p>
+                          </div>
+                        )}
                       </div>
                     ) : (
-                      <div className="bg-white p-12 rounded-[2.5rem] text-center space-y-4 border border-dashed border-gray-200 shadow-sm">
-                        <div className="bg-gray-50 w-16 h-16 rounded-2xl flex items-center justify-center text-gray-300 mx-auto opacity-50">
-                          <Bike className="h-8 w-8" />
-                        </div>
-                        <p className="text-xs text-gray-400 font-black uppercase tracking-widest">No active mission</p>
-                      </div>
+                      activeOrder && (
+                        <motion.div 
+                          layoutId={activeOrder.id}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-8 relative overflow-hidden group"
+                        >
+                           <div className="absolute top-0 right-0 p-6 flex flex-col items-end space-y-2">
+                             <span className="text-[9px] bg-eln-primary/10 text-eln-primary px-3 py-1 rounded-lg font-black uppercase tracking-widest border border-eln-primary/20">{activeOrder.status}</span>
+                             <a 
+                               href={`tel:${activeOrder.customerPhone}`}
+                               className="h-10 w-10 bg-green-500 text-white rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg shadow-green-500/20"
+                               title="Call Customer"
+                             >
+                               <Phone className="h-5 w-5" />
+                             </a>
+                          </div>
+                          <div className="flex items-center space-x-4">
+                             <div className="bg-eln-primary/5 p-3 rounded-2xl text-eln-primary"><Package className="h-6 w-6" /></div>
+                             <div>
+                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Client</p>
+                                <p className="font-black text-xl text-slate-900">{activeOrder.customerName}</p>
+                             </div>
+                          </div>
+                          <div className="space-y-6">
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="bg-gray-50 p-6 rounded-3xl space-y-4 border border-gray-100">
+                                   <div className="flex items-center space-x-3">
+                                      <MapPin className="h-4 w-4 text-eln-primary" />
+                                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Pickup From</p>
+                                   </div>
+                                   <div className="space-y-1">
+                                      <p className="text-sm font-black text-slate-900">{activeOrder.merchantName}</p>
+                                      <p className="text-xs text-gray-500 font-medium leading-relaxed">{activeOrder.pickupAddress}</p>
+                                   </div>
+                                </div>
+                                <div className="bg-gray-50 p-6 rounded-3xl space-y-4 border border-gray-100">
+                                   <div className="flex items-center space-x-3">
+                                      <MapPin className="h-4 w-4 text-eln-primary" />
+                                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Deliver To</p>
+                                   </div>
+                                   <div className="space-y-1">
+                                      <p className="text-sm font-black text-slate-900">{activeOrder.customerName}</p>
+                                      <p className="text-xs text-gray-500 font-medium leading-relaxed">{activeOrder.deliveryAddress}</p>
+                                   </div>
+                                </div>
+                             </div>
+
+                             <div className="bg-gray-50 p-6 rounded-3xl space-y-3 border border-gray-100">
+                                <div className="flex items-center space-x-3">
+                                   <Package className="h-4 w-4 text-eln-primary" />
+                                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Goodies</p>
+                                </div>
+                                <p className="text-sm font-bold text-gray-700">{activeOrder.itemsDescription || 'No description provided'}</p>
+                             </div>
+
+                             {activeOrder.status === OrderStatus.OUT_FOR_DELIVERY && (
+                              <div className="space-y-3">
+                                  <div className="flex justify-between items-center">
+                                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verification Code</p>
+                                      {verificationError && <span className="text-[9px] font-black text-red-500 uppercase">Invalid Code</span>}
+                                  </div>
+                                  <input 
+                                      type="text" 
+                                      value={verificationInput}
+                                      onChange={(e) => {
+                                        setVerificationInput(e.target.value);
+                                        setVerificationError(false);
+                                      }}
+                                      placeholder="Enter 5-digit code from customer"
+                                      className={`w-full p-4 bg-gray-50 border-2 rounded-2xl font-black text-center tracking-[0.5em] focus:ring-0 transition-all ${verificationError ? 'border-red-500 text-red-500' : 'border-gray-100 text-gray-900 focus:border-eln-primary'}`}
+                                      maxLength={5}
+                                  />
+                              </div>
+                             )}
+                             
+                             <div className="flex flex-col space-y-3 pt-4">
+                               <button 
+                                  onClick={() => setActiveTab('map')}
+                                  className="w-full py-4 bg-white border border-gray-100 text-gray-900 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center space-x-2 hover:bg-gray-50 transition-all shadow-sm"
+                               >
+                                 <Navigation className="h-4 w-4" />
+                                 <span>Launch Navigation</span>
+                               </button>
+                               
+                               {activeOrder.status === OrderStatus.ACCEPTED && (
+                                 <motion.button 
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => updateStatus(activeOrder.id, OrderStatus.PICKED_UP)} 
+                                    className="w-full py-5 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-2 active:scale-95 transition-all group"
+                                 >
+                                   <Package className="h-4 w-4 group-hover:rotate-12 transition-transform" />
+                                   <span>Confirm Pickup at Merchant</span>
+                                 </motion.button>
+                               )}
+
+                               {activeOrder.status === OrderStatus.PICKED_UP && (
+                                 <motion.button 
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => updateStatus(activeOrder.id, OrderStatus.IN_TRANSIT)} 
+                                    className="w-full py-5 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-2 active:scale-95 transition-all group"
+                                 >
+                                   <RefreshCw className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
+                                   <span>Start Transit to Customer</span>
+                                 </motion.button>
+                               )}
+
+                               {activeOrder.status === OrderStatus.IN_TRANSIT && (
+                                 <motion.button 
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => updateStatus(activeOrder.id, OrderStatus.OUT_FOR_DELIVERY)} 
+                                    className="w-full py-5 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-eln-primary/20 flex items-center justify-center space-x-2 active:scale-95 transition-all group"
+                                 >
+                                   <Bike className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                   <span>Out for Delivery</span>
+                                 </motion.button>
+                               )}
+
+                               {activeOrder.status === OrderStatus.OUT_FOR_DELIVERY && (
+                                 <motion.button 
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => updateStatus(activeOrder.id, OrderStatus.DELIVERED)} 
+                                    className="w-full py-5 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-600/20 flex items-center justify-center space-x-2 active:scale-95 transition-all group"
+                                 >
+                                   <CheckCircle2 className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                                   <span>Confirm Successful Delivery</span>
+                                 </motion.button>
+                               )}
+                             </div>
+                          </div>
+                        </motion.div>
+                      )
                     )}
                   </div>
 
@@ -647,40 +752,70 @@ const RiderDashboard: React.FC<RiderDashboardProps> = ({ user, onLogout }) => {
                     <div className="space-y-4">
                       {newRequests.length > 0 ? (
                         newRequests.map((req) => (
-                          <div key={req.id} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:border-eln-primary/30 transition-all group">
-                            <div className="flex justify-between items-start mb-6">
-                              <div className="flex items-center space-x-3">
-                                <div className="bg-eln-primary/5 p-2.5 rounded-xl text-eln-primary">
-                                  <Package className="h-5 w-5" />
+                          <motion.div 
+                            key={req.id} 
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="bg-slate-900 rounded-[2.5rem] p-8 text-white space-y-8 relative overflow-hidden group shadow-2xl"
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="flex items-center space-x-4">
+                                <div className="bg-eln-primary p-3 rounded-2xl text-white">
+                                  <Package className="h-6 w-6" />
                                 </div>
                                 <div>
-                                  <p className="font-black text-eln-orange-deep text-sm tracking-tight">Mission #{req.id.slice(0, 8)}</p>
-                                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">₦2,500.00 • Standard</p>
+                                  <p className="font-black text-xl tracking-tight">New Mission</p>
+                                  <p className="text-[10px] font-bold text-eln-primary uppercase tracking-widest">#{req.id.slice(0, 8)}</p>
                                 </div>
                               </div>
-                              <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">{new Date(req.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{new Date(req.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-4 mb-6">
+
+                            <div className="grid grid-cols-2 gap-8 border-y border-slate-800 py-8">
                                <div className="space-y-1">
-                                  <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Pickup</p>
-                                  <p className="font-bold text-gray-800 text-xs truncate">{req.merchantName}</p>
+                                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Estimated Pay</p>
+                                  <p className="font-black text-2xl text-white text-emerald-400">₦{req.deliveryFee?.toLocaleString()}</p>
                                </div>
                                <div className="space-y-1">
-                                  <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Dropoff</p>
-                                  <p className="font-bold text-gray-800 text-xs truncate">{req.customerName}</p>
+                                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Distance</p>
+                                  <p className="font-black text-2xl text-white opacity-90">~4.2 km</p>
                                </div>
                             </div>
-                            <div className="flex space-x-3">
-                               <button onClick={() => handleAccept(req.id)} className="flex-1 bg-eln-primary text-white py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center space-x-2 shadow-lg shadow-eln-primary/20 active:scale-95 transition-all">
+
+                            <div className="space-y-4">
+                              <div className="flex items-start space-x-3">
+                                <div className="h-2 w-2 rounded-full bg-eln-primary mt-1.5" />
+                                <div>
+                                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">From</p>
+                                  <p className="font-bold text-sm text-slate-200">{req.merchantName}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-start space-x-3">
+                                <div className="h-2 w-2 rounded-full bg-emerald-500 mt-1.5" />
+                                <div>
+                                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">To</p>
+                                  <p className="font-bold text-sm text-slate-200">{req.deliveryAddress}</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex space-x-4 flex-col sm:flex-row gap-y-3 sm:gap-y-0">
+                               <button 
+                                 onClick={() => handleAccept(req.id)} 
+                                 className="flex-1 bg-white text-slate-900 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center space-x-3 hover:bg-eln-primary hover:text-white transition-all active:scale-95"
+                               >
                                  <Check className="h-4 w-4" />
-                                 <span>Accept</span>
+                                 <span>Accept Mission</span>
                                </button>
-                               <button onClick={() => handleDecline(req.id)} className="flex-1 bg-gray-50 text-gray-400 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center space-x-2 border border-gray-100 active:scale-95 transition-all">
+                               <button 
+                                 onClick={() => handleDecline(req.id)} 
+                                 className="flex-1 bg-slate-800 text-slate-400 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center space-x-3 border border-slate-700 hover:bg-red-500/10 hover:text-red-500 transition-all active:scale-95"
+                               >
                                  <Ban className="h-4 w-4" />
                                  <span>Decline</span>
                                </button>
                             </div>
-                          </div>
+                          </motion.div>
                         ))
                       ) : (
                         <div className="bg-white p-12 rounded-[2.5rem] text-center space-y-4 border border-dashed border-gray-200 shadow-sm">

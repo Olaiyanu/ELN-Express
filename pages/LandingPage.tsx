@@ -266,96 +266,100 @@ const LandingPage: React.FC = () => {
       </motion.nav>
 
       {/* Hero Section: Immersive Background Slider */}
-      <header className="relative min-h-screen flex items-center justify-center overflow-hidden bg-eln-orange-deep">
+      <header className="relative min-h-screen flex items-center justify-center overflow-hidden bg-eln-orange-black">
         {/* Background Image Slider */}
         <div className="absolute inset-0 z-0">
           <AnimatePresence initial={false}>
             <motion.div
               key={currentImageIndex}
-              initial={{ opacity: 0, scale: 1.15 }}
+              initial={{ opacity: 0, scale: 1.1 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 2, ease: [0.4, 0, 0.2, 1] }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 2.5, ease: [0.4, 0, 0.2, 1] }}
               className="absolute inset-0"
             >
               <img 
                 src={HERO_IMAGES[currentImageIndex].url} 
                 alt={HERO_IMAGES[currentImageIndex].alt} 
-                className="w-full h-full object-cover grayscale-[0.2] brightness-[0.25]"
+                className="w-full h-full object-cover grayscale-[0.4] brightness-[0.2]"
                 referrerPolicy="no-referrer"
               />
             </motion.div>
           </AnimatePresence>
           
-          {/* Advanced Gradient Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-eln-orange-deep z-10"></div>
-          <div className="absolute inset-0 bg-gradient-to-tr from-eln-orange-deep/30 via-transparent to-black/40 z-10"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-transparent to-black/60 z-10"></div>
+          {/* Refined Gradient Overlays */}
+          <div className="absolute inset-0 bg-gradient-to-b from-eln-orange-black via-transparent to-eln-orange-black z-10 opacity-80"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-eln-orange-black/60 via-transparent to-eln-orange-black/60 z-10"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(18,6,0,0.8)_100%)] z-10"></div>
           
-          {/* Animated Mesh-like particles or noise could go here */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+          {/* Subtle Noise Texture */}
+          <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-20 text-center pt-32 sm:pt-40">
+          {/* Badge */}
           <motion.div 
-            key={lang}
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center space-x-3 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full text-white text-[9px] font-black uppercase tracking-[0.2em] mb-10 shadow-xl"
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="inline-flex items-center space-x-3 px-5 py-2.5 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-full text-white text-[10px] font-black uppercase tracking-[0.25em] mb-12 shadow-2xl"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-eln-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-eln-primary"></span>
             </span>
-            <span className="opacity-70">{t.badge}</span>
+            <span className="opacity-80">{t.badge}</span>
           </motion.div>
 
-          <h1 
-            key={`title-${lang}`}
-            className="text-5xl sm:text-7xl lg:text-9xl font-black text-white leading-[0.95] tracking-tighter mb-8 transform -skew-x-1"
-          >
-            <div className="reveal-text overflow-hidden">
-              <Typewriter text={t.heroTitle1} delay={500} speed={60} />
-            </div>
-            <div className="reveal-text text-eln-primary/90 mt-1">
-              <Typewriter text={t.heroTitle2} delay={1800} speed={60} />
-            </div>
-          </h1>
+          {/* Title */}
+          <div className="overflow-hidden mb-8">
+            <motion.h1 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              className="text-6xl sm:text-8xl lg:text-[10rem] font-black text-white leading-[0.88] tracking-tighter"
+            >
+              {t.heroTitle1}
+            </motion.h1>
+            <motion.h1 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
+              className="text-6xl sm:text-8xl lg:text-[10rem] font-black text-eln-primary leading-[0.88] tracking-tighter mt-2"
+            >
+              {t.heroTitle2}
+            </motion.h1>
+          </div>
 
+          {/* Description */}
           <motion.p 
-            key={`desc-${lang}`}
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="text-base sm:text-xl text-white/40 font-medium max-w-xl mx-auto mb-12 leading-relaxed"
+            transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
+            className="text-base sm:text-lg text-white/60 font-medium max-w-2xl mx-auto mb-14 leading-relaxed tracking-wide"
           >
             {t.heroDesc}
           </motion.p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 3.2 }}
-              className="w-full sm:w-auto"
-            >
-              <Link to="/signup" className="w-full px-8 py-4 bg-eln-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-eln-primary/10 flex items-center justify-center space-x-2 hover:scale-[1.02] transition-all border border-white/10">
+          {/* Actions */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
+            className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
+          >
+            <Link to="/signup" className="group relative w-full sm:w-auto px-10 py-5 bg-eln-primary text-white rounded-2xl font-black text-[11px] uppercase tracking-widest overflow-hidden transition-all hover:scale-[1.05] active:scale-95 shadow-2xl shadow-eln-primary/20">
+              <span className="relative z-10 flex items-center justify-center space-x-3">
                 <span>{common.getStarted}</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </motion.div>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </span>
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            </Link>
 
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 3.4 }}
-              className="w-full sm:w-auto"
-            >
-              <Link to="/login" className="w-full px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center hover:bg-white/10 transition-all">
-                Merchant or Rider Login
-              </Link>
-            </motion.div>
-          </div>
+            <button className="w-full sm:w-auto px-10 py-5 bg-white/5 backdrop-blur-xl border border-white/10 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all hover:bg-white/10 active:scale-95">
+              {t.learnMore}
+            </button>
+          </motion.div>
         </div>
 
         {/* Hero Indicators & Floating Trust */}

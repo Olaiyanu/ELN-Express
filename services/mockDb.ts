@@ -39,6 +39,7 @@ const defaultOrders: Order[] = [
     customerName: 'Bisi Akande',
     customerPhone: '08099887766',
     status: OrderStatus.PENDING,
+    verificationCode: 'ABCDE',
     createdAt: Date.now() - 3600000,
     updatedAt: Date.now() - 3600000,
     paymentMethod: 'Card',
@@ -55,6 +56,7 @@ const defaultOrders: Order[] = [
     customerName: 'Chidi Okafor',
     customerPhone: '08122334455',
     status: OrderStatus.PENDING,
+    verificationCode: 'FGHIJ',
     createdAt: Date.now() - 7200000,
     updatedAt: Date.now() - 7200000,
     paymentMethod: 'Cash',
@@ -71,6 +73,7 @@ const defaultOrders: Order[] = [
     customerName: 'Funmi Adebayo',
     customerPhone: '07033445566',
     status: OrderStatus.PENDING,
+    verificationCode: 'KLMNO',
     createdAt: Date.now() - 10800000,
     updatedAt: Date.now() - 10800000,
     paymentMethod: 'Card',
@@ -136,22 +139,59 @@ export const mockDb = {
     const order = orders.find(o => o.id === orderId);
     if (order) {
       const oldStatus = order.status;
+      const wasAssignedToRider = oldStatus === OrderStatus.ASSIGNED || oldStatus === OrderStatus.ACCEPTED;
+      
       order.status = status;
       order.updatedAt = Date.now();
-      if (riderId) order.riderId = riderId;
-      if (riderName) order.riderName = riderName;
+      if (riderId !== undefined) order.riderId = riderId; // Handle '' to unassign
+      if (riderName !== undefined) order.riderName = riderName;
       mockDb.saveOrder(order);
 
+      // Notify Admin on Decline
+      if (status === OrderStatus.PENDING && wasAssignedToRider) {
+        const admins = mockDb.getUsers().filter(u => u.role === UserRole.ADMIN);
+        admins.forEach(admin => {
+          mockDb.addNotification({
+            id: Math.random().toString(36).substring(2, 11),
+            userId: admin.uid,
+            title: 'Mission Rejected ⚠️',
+            message: `Order #${order.id.slice(0, 8)} was rejected by a rider. Please re-assign to another available rider.`,
+            type: 'system',
+            read: false,
+            createdAt: Date.now()
+          });
+        });
+      }
+
       // Notify Merchant
+      const isDelivered = status === OrderStatus.DELIVERED;
       mockDb.addNotification({
         id: Math.random().toString(36).substring(2, 11),
         userId: order.merchantId,
-        title: 'Order Status Updated',
-        message: `Order #${order.id.slice(0, 8)} is now ${status}.`,
+        title: isDelivered ? 'Mission Accomplished! 🎉' : 'Order Status Updated',
+        message: isDelivered 
+          ? `Order #${order.id.slice(0, 8)} has been successfully delivered to ${order.customerName}. Verification code confirmed.`
+          : `Order #${order.id.slice(0, 8)} is now ${status}.`,
         type: 'order',
         read: false,
         createdAt: Date.now()
       });
+
+      // Notify Admin on Delivery
+      if (isDelivered) {
+        const admins = mockDb.getUsers().filter(u => u.role === UserRole.ADMIN);
+        admins.forEach(admin => {
+          mockDb.addNotification({
+            id: Math.random().toString(36).substring(2, 11),
+            userId: admin.uid,
+            title: 'Delivery Complete',
+            message: `Order #${order.id.slice(0, 8)} from ${order.merchantName} has been delivered successfully by ${riderName || 'Rider'}.`,
+            type: 'system',
+            read: false,
+            createdAt: Date.now()
+          });
+        });
+      }
 
       // Notify Rider if assigned
       if (status === OrderStatus.ASSIGNED && riderId) {
@@ -159,7 +199,7 @@ export const mockDb = {
           id: Math.random().toString(36).substring(2, 11),
           userId: riderId,
           title: 'New Mission Assigned',
-          message: `You have been assigned to order #${order.id.slice(0, 8)}. Items: ${order.itemsDescription || 'N/A'}. Verification Code: ${order.verificationCode}.`,
+          message: `You have been assigned to order #${order.id.slice(0, 8)}. Items: ${order.itemsDescription || 'N/A'}. Please contact the merchant for pickup.`,
           type: 'order',
           read: false,
           createdAt: Date.now()
